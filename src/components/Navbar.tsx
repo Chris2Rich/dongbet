@@ -8,7 +8,7 @@ const Navbar = () => {
       </span>
       <div className="hidden sm:flex items-center gap-4 text-sm text-muted-foreground">
         <a href="#how" className="hover:text-foreground transition-colors">How it works</a>
-        <a href="#standings" className="hover:text-foreground transition-colors">Standings</a>
+        <a href="#countdown" className="hover:text-foreground transition-colors">Countdown</a>
       </div>
       <Button size="sm">Join now</Button>
     </nav>

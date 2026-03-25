@@ -32,7 +32,7 @@ const HeroSection = () => {
         <div className="animate-fade-up">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 mb-8">
             <Zap className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-primary">Season 2026 is live</span>
+            <span className="text-sm font-medium text-primary">2nd April 2026</span>
           </div>
         </div>
 
