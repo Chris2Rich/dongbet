@@ -70,9 +70,9 @@ const HeroSection = () => {
           style={{ animationDelay: "400ms" }}
         >
           {[
-            { value: "12K+", label: "Predictors" },
-            { value: "£5K", label: "Prize Pool" },
-            { value: "380", label: "Matches" },
+            { value: "1.2K", label: "Predictors" },
+            { value: "£250", label: "Prize Pool" },
+            { value: "50+", label: "Contracts" },
           ].map((stat) => (
             <div key={stat.label} className="text-center">
               <div className="font-display text-2xl sm:text-3xl text-primary">{stat.value}</div>
