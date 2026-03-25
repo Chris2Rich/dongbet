@@ -2,7 +2,7 @@ import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import PredictionCard from "@/components/PredictionCard";
 import HowItWorks from "@/components/HowItWorks";
-import LeaderboardSection from "@/components/LeaderboardSection";
+import CountdownSection from "@/components/CountdownSection";
 import FooterSection from "@/components/FooterSection";
 
 const Index = () => {
@@ -27,8 +27,8 @@ const Index = () => {
       <div id="how">
         <HowItWorks />
       </div>
-      <div id="standings">
-        <LeaderboardSection />
+      <div id="countdown">
+        <CountdownSection />
       </div>
       <FooterSection />
     </div>
