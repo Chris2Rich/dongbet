@@ -1,16 +1,38 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import Navbar from "@/components/Navbar";
+import HeroSection from "@/components/HeroSection";
+import PredictionCard from "@/components/PredictionCard";
+import HowItWorks from "@/components/HowItWorks";
+import LeaderboardSection from "@/components/LeaderboardSection";
+import FooterSection from "@/components/FooterSection";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <HeroSection />
+
+      {/* Live prediction showcase */}
+      <section className="py-20 relative">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="font-display text-3xl sm:text-4xl uppercase text-foreground mb-3">
+              Make your <span className="text-primary text-glow">call</span>
+            </h2>
+            <p className="text-muted-foreground">Try a live prediction right now.</p>
+          </div>
+          <PredictionCard />
+        </div>
+      </section>
+
+      <div id="how">
+        <HowItWorks />
+      </div>
+      <div id="standings">
+        <LeaderboardSection />
+      </div>
+      <FooterSection />
     </div>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
