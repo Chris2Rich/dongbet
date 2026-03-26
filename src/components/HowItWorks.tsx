@@ -20,10 +20,10 @@ const steps = [
 
 const HowItWorks = () => {
   return (
-    <section className="py-32 relative">
-      <div className="container mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="font-display text-4xl sm:text-5xl md:text-6xl uppercase text-foreground mb-4">
+    <section className="py-16 sm:py-24 md:py-32 relative">
+      <div className="container mx-auto">
+        <div className="text-center mb-10 sm:mb-16">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl uppercase text-foreground mb-4">
             How it <span className="text-primary text-glow">works</span>
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
@@ -31,17 +31,17 @@ const HowItWorks = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 max-w-4xl mx-auto">
           {steps.map((step, i) => (
             <div
               key={step.title}
-              className="group relative bg-card border border-border rounded-xl p-8 text-center transition-all duration-300 hover:border-primary/30 hover:shadow-[0_0_30px_hsl(138_100%_59%/0.08)]"
+              className="group relative bg-card border border-border rounded-xl p-6 sm:p-8 text-center transition-all duration-300 hover:border-primary/30 hover:shadow-[0_0_30px_hsl(138_100%_59%/0.08)]"
               style={{ animationDelay: `${i * 150}ms` }}
             >
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-primary/10 text-primary mb-6 transition-transform duration-300 group-hover:scale-110">
-                <step.icon className="w-7 h-7" />
+              <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-primary/10 text-primary mb-4 sm:mb-6 transition-transform duration-300 group-hover:scale-110">
+                <step.icon className="w-6 h-6 sm:w-7 sm:h-7" />
               </div>
-              <h3 className="font-display text-xl uppercase text-foreground mb-3">{step.title}</h3>
+              <h3 className="font-display text-lg sm:text-xl uppercase text-foreground mb-3">{step.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
 
               {/* Step number */}

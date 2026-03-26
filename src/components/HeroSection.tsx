@@ -20,7 +20,7 @@ const HeroSection = () => {
       {/* Watermark */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
         <h2
-          className="font-display text-[18vw] leading-none tracking-tighter text-foreground/[0.03] uppercase"
+          className="font-display text-[25vw] leading-none tracking-tighter text-foreground/[0.03] uppercase"
           aria-hidden="true"
         >
           DONGBET
@@ -28,7 +28,7 @@ const HeroSection = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-6 text-center">
+      <div className="relative z-10 container mx-auto text-center">
         <div className="animate-fade-up">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 mb-8">
             <Zap className="w-4 h-4 text-primary" />
@@ -37,7 +37,7 @@ const HeroSection = () => {
         </div>
 
         <h1
-          className="font-display text-5xl sm:text-7xl md:text-8xl lg:text-9xl uppercase leading-[0.9] tracking-tight mb-6 animate-fade-up"
+          className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl uppercase leading-[0.9] tracking-tight mb-6 animate-fade-up"
           style={{ animationDelay: "100ms" }}
         >
           <span className="text-foreground">DONG</span>

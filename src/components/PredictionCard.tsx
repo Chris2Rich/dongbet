@@ -11,7 +11,7 @@ const PredictionCard = () => {
   ];
 
   return (
-    <div className="relative bg-card border border-border rounded-xl p-6 max-w-md mx-auto overflow-hidden transition-all duration-300 hover:border-primary/30">
+    <div className="relative bg-card border border-border rounded-xl p-4 sm:p-6 max-w-md mx-auto overflow-hidden transition-all duration-300 hover:border-primary/30">
       {/* Flash effect */}
       {selected && (
         <div className="absolute inset-0 bg-primary/5 animate-pulse pointer-events-none" />
@@ -40,7 +40,7 @@ const PredictionCard = () => {
         </div>
 
         {/* Prediction toggles */}
-        <div className="grid grid-cols-3 gap-2 mb-4">
+        <div className="grid grid-cols-2 gap-2 mb-4">
           {outcomes.map((outcome) => (
             <button
               key={outcome.value}
