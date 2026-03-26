@@ -19,7 +19,7 @@ const FooterSection = () => {
           Don't just <span className="text-primary text-glow">watch</span>
         </h2>
         <p className="text-xl text-muted-foreground mb-10 max-w-lg mx-auto">
-          Your intuition, rewarded. Join thousands of predictors competing every matchday.
+          Your intuition, rewarded. Join thousands of predictors competing at the end of the term.
         </p>
         <Button variant="hero" size="xl" className="animate-pulse-glow">
           <Trophy className="w-5 h-5" />
@@ -33,10 +33,9 @@ const FooterSection = () => {
             </span>
             <div className="flex items-center gap-6 text-sm text-muted-foreground">
               <a href="#" className="hover:text-foreground transition-colors">Rules</a>
-              <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
-              <a href="#" className="hover:text-foreground transition-colors">Contact</a>
+              <a href="mailto:19czaccaria@thelangton.org.uk" className="hover:text-foreground transition-colors">Contact</a>
             </div>
-            <span className="text-xs text-muted-foreground">© 2026 DongBet</span>
+            <span className="text-xs text-muted-foreground">2026 DongBet</span>
           </div>
         </div>
       </div>

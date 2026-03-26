@@ -4,7 +4,7 @@ const steps = [
   {
     icon: Target,
     title: "PREDICT",
-    description: "Pick your outcomes for upcoming matches. Home win, draw, or away — lock it in before kickoff.",
+    description: "Pick your outcomes for upcoming matches and events that will happen on the day. Which team will win — make predictions before and during games.",
   },
   {
     icon: TrendingUp,
@@ -14,7 +14,7 @@ const steps = [
   {
     icon: Trophy,
     title: "WIN",
-    description: "Top the leaderboard at the end of the season and claim your share of the prize pool.",
+    description: "Top the leaderboard. At the end of the tournament winners will recieve their prizes.",
   },
 ];
 

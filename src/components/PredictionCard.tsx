@@ -6,9 +6,8 @@ const PredictionCard = () => {
   const [selected, setSelected] = useState<string | null>(null);
 
   const outcomes = [
-    { label: "HOME", value: "home" },
-    { label: "DRAW", value: "draw" },
-    { label: "AWAY", value: "away" },
+    { label: "Burgess", value: "home" },
+    { label: "Hardman", value: "away" },
   ];
 
   return (
@@ -21,22 +20,22 @@ const PredictionCard = () => {
       <div className="relative z-10">
         {/* Match header */}
         <div className="flex items-center justify-between mb-1">
-          <span className="text-xs text-muted-foreground uppercase tracking-wider">Premier League</span>
-          <span className="text-xs font-medium text-primary tabular-nums">LIVE · 67'</span>
+          <span className="text-xs text-muted-foreground uppercase tracking-wider">Dong Chen</span>
+          <span className="text-xs font-medium text-primary tabular-nums">Match 1</span>
         </div>
 
         {/* Teams */}
         <div className="flex items-center justify-between py-6">
           <div className="text-center flex-1">
             <div className="text-3xl mb-2">🔴</div>
-            <div className="font-semibold text-foreground text-sm">Arsenal</div>
+            <div className="font-semibold text-foreground text-sm">Burgess</div>
           </div>
           <div className="text-center px-4">
             <div className="font-display text-3xl text-foreground tabular-nums">2 - 1</div>
           </div>
           <div className="text-center flex-1">
             <div className="text-3xl mb-2">🔵</div>
-            <div className="font-semibold text-foreground text-sm">Chelsea</div>
+            <div className="font-semibold text-foreground text-sm">Hardman</div>
           </div>
         </div>
 
