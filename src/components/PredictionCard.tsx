@@ -6,8 +6,8 @@ const PredictionCard = () => {
   const [selected, setSelected] = useState<string | null>(null);
 
   const outcomes = [
-    { label: "Burgess", value: "home" },
-    { label: "Hardman", value: "away" },
+    { label: "Brazil", value: "home" },
+    { label: "Jamaica", value: "away" },
   ];
 
   return (
@@ -27,15 +27,15 @@ const PredictionCard = () => {
         {/* Teams */}
         <div className="flex items-center justify-between py-6">
           <div className="text-center flex-1">
-            <div className="text-3xl mb-2">🔴</div>
-            <div className="font-semibold text-foreground text-sm">Burgess</div>
+            <div className="text-3xl mb-2">🇧🇷</div>
+            <div className="font-semibold text-foreground text-sm">Brazil</div>
           </div>
           <div className="text-center px-4">
             <div className="font-display text-3xl text-foreground tabular-nums">2 - 1</div>
           </div>
           <div className="text-center flex-1">
-            <div className="text-3xl mb-2">🔵</div>
-            <div className="font-semibold text-foreground text-sm">Hardman</div>
+            <div className="text-3xl mb-2">🇯🇲</div>
+            <div className="font-semibold text-foreground text-sm">Jamaica</div>
           </div>
         </div>
 

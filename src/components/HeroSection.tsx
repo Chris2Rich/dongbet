@@ -71,7 +71,7 @@ const HeroSection = () => {
         >
           {[
             { value: "1000+", label: "Participants" },
-            { value: "£250", label: "Prize Pool" },
+            { value: "£100+", label: "Prize Pool" },
             { value: "15+", label: "Games" },
           ].map((stat) => (
             <div key={stat.label} className="text-center">
