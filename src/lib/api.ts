@@ -19,6 +19,16 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
   return response.json();
 }
 
+async function fetchLocalData(): Promise<{ users: Record<string, any>; matches: Match[] }> {
+  try {
+    const response = await fetch('/data.json');
+    if (!response.ok) throw new Error('Failed to fetch data');
+    return await response.json();
+  } catch {
+    return { users: {}, matches: [] };
+  }
+}
+
 export async function login(code: string): Promise<User> {
   try {
     const result = await fetchApi<{ success: boolean; user: User }>('/login', {
@@ -28,15 +38,8 @@ export async function login(code: string): Promise<User> {
     return result.user;
   } catch (error) {
     console.warn('API unavailable, using local data');
-    const response = await fetch('/users.json');
-    const users: Record<string, { 
-      firstname: string; 
-      lastname: string; 
-      formgroup: string;
-      points: number;
-      predictions: any[];
-    }> = await response.json();
-    const user = users[code];
+    const data = await fetchLocalData();
+    const user = data.users[code];
     
     if (user) {
       return {
@@ -56,6 +59,20 @@ export async function getUser(code: string): Promise<User | null> {
   try {
     return await fetchApi<User>(`/user?code=${code}`);
   } catch {
+    try {
+      const data = await fetchLocalData();
+      const user = data.users[code];
+      if (user) {
+        return {
+          code,
+          firstname: user.firstname,
+          lastname: user.lastname,
+          formgroup: user.formgroup,
+          points: user.points || 100,
+          predictions: user.predictions || [],
+        };
+      }
+    } catch {}
     return null;
   }
 }
@@ -67,14 +84,10 @@ export async function predict(
   contractId: string, 
   stake: number
 ): Promise<{ success: boolean; prediction: any; remainingPoints: number; market: any }> {
-  try {
-    return await fetchApi('/predict', {
-      method: 'POST',
-      body: JSON.stringify({ code, matchId, marketId, contractId, stake }),
-    });
-  } catch (error) {
-    throw error;
-  }
+  return await fetchApi('/predict', {
+    method: 'POST',
+    body: JSON.stringify({ code, matchId, marketId, contractId, stake }),
+  });
 }
 
 export async function resolveMarket(
@@ -82,14 +95,10 @@ export async function resolveMarket(
   marketId: string,
   contractId: string
 ): Promise<{ success: boolean; settled: number; totalPayout: number }> {
-  try {
-    return await fetchApi('/resolve', {
-      method: 'POST',
-      body: JSON.stringify({ matchId, marketId, contractId }),
-    });
-  } catch (error) {
-    throw error;
-  }
+  return await fetchApi('/resolve', {
+    method: 'POST',
+    body: JSON.stringify({ matchId, marketId, contractId }),
+  });
 }
 
 export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
@@ -97,22 +106,16 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
     return await fetchApi<LeaderboardEntry[]>('/leaderboard');
   } catch {
     console.warn('API unavailable, using local data');
-    const response = await fetch('/users.json');
-    const users: Record<string, { 
-      firstname: string; 
-      lastname: string; 
-      formgroup: string;
-      points: number;
-    }> = await response.json();
+    const data = await fetchLocalData();
     
-    return Object.entries(users)
-      .map(([code, user], index) => ({
+    return Object.entries(data.users)
+      .map(([code, user]: [string, any]) => ({
         code,
         firstname: user.firstname,
         lastname: user.lastname,
         formgroup: user.formgroup,
         points: user.points || 100,
-        rank: index + 1,
+        rank: 0,
       }))
       .sort((a, b) => b.points - a.points)
       .map((entry, index) => ({ ...entry, rank: index + 1 }));
@@ -124,6 +127,8 @@ export async function getMatches(): Promise<Match[]> {
     const data = await fetchApi<{ matches: Match[] }>('/matches');
     return data.matches;
   } catch {
-    return [];
+    console.warn('API unavailable, using local data');
+    const data = await fetchLocalData();
+    return data.matches || [];
   }
 }
