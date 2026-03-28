@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,50 +6,49 @@
 
 @layer base {
   :root {
-    --background: 240 6% 4%;
-    --foreground: 240 5% 96%;
+    --background: 220 30% 3%;
+    --foreground: 40 100% 98%;
 
-    --card: 240 4% 9%;
-    --card-foreground: 240 5% 96%;
+    --card: 220 25% 6%;
+    --card-foreground: 40 100% 98%;
 
-    --popover: 240 4% 9%;
-    --popover-foreground: 240 5% 96%;
+    --popover: 220 25% 6%;
+    --popover-foreground: 40 100% 98%;
 
-    --primary: 138 100% 59%;
-    --primary-foreground: 0 0% 0%;
+    --primary: 85 100% 55%;
+    --primary-foreground: 220 30% 3%;
 
-    --secondary: 240 4% 14%;
-    --secondary-foreground: 240 5% 96%;
+    --secondary: 220 20% 10%;
+    --secondary-foreground: 40 100% 98%;
 
-    --muted: 240 4% 14%;
-    --muted-foreground: 240 5% 65%;
+    --muted: 220 15% 12%;
+    --muted-foreground: 220 10% 60%;
 
-    --accent: 138 100% 59%;
-    --accent-foreground: 0 0% 0%;
+    --accent: 38 100% 55%;
+    --accent-foreground: 220 30% 3%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 80% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 100% / 0.08;
-    --input: 240 4% 14%;
-    --ring: 138 100% 59%;
+    --border: 0 0% 100% / 0.06;
+    --input: 220 15% 12%;
+    --ring: 85 100% 55%;
 
-    --radius: 0.25rem;
+    --radius: 0.5rem;
 
-    --sidebar-background: 240 6% 4%;
-    --sidebar-foreground: 240 5% 96%;
-    --sidebar-primary: 138 100% 59%;
-    --sidebar-primary-foreground: 0 0% 0%;
-    --sidebar-accent: 240 4% 14%;
-    --sidebar-accent-foreground: 240 5% 96%;
-    --sidebar-border: 0 0% 100% / 0.08;
-    --sidebar-ring: 138 100% 59%;
+    --sidebar-background: 220 30% 3%;
+    --sidebar-foreground: 40 100% 98%;
+    --sidebar-primary: 85 100% 55%;
+    --sidebar-primary-foreground: 220 30% 3%;
+    --sidebar-accent: 220 20% 10%;
+    --sidebar-accent-foreground: 40 100% 98%;
+    --sidebar-border: 0 0% 100% / 0.06;
+    --sidebar-ring: 85 100% 55%;
 
-    /* Custom tokens */
-    --surface: 240 4% 9%;
-    --surface-hover: 240 4% 12%;
-    --glow: 138 100% 59%;
-    --warning: 48 100% 50%;
+    --surface: 220 20% 8%;
+    --surface-hover: 220 20% 12%;
+    --glow: 85 100% 55%;
+    --warning: 38 100% 55%;
   }
 }
 
@@ -60,20 +59,132 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', sans-serif;
+    font-family: 'DM Sans', sans-serif;
   }
 
-  h1, h2, h3 {
-    font-family: 'Archivo Black', sans-serif;
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
   }
 }
 
 @layer utilities {
   .text-glow {
-    text-shadow: 0 0 40px hsl(var(--glow) / 0.4);
+    text-shadow: 0 0 60px hsl(var(--glow) / 0.5), 0 0 100px hsl(var(--glow) / 0.3);
   }
 
   .font-display {
-    font-family: 'Archivo Black', sans-serif;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
   }
+
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .bg-grid {
+    background-image: 
+      linear-gradient(hsl(var(--foreground) / 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--foreground) / 0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  .bg-noise {
+    position: relative;
+  }
+
+  .bg-noise::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+  }
+
+  .glass {
+    background: hsl(var(--card) / 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--border));
+  }
+
+  .glass-strong {
+    background: hsl(var(--card) / 0.8);
+    backdrop-filter: blur(30px);
+    border: 1px solid hsl(var(--border));
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--primary) / 0) 0%,
+      hsl(var(--primary) / 0.1) 50%,
+      hsl(var(--primary) / 0) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient-shift 8s ease infinite;
+  }
+
+  @keyframes gradient-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { 
+      box-shadow: 0 0 20px hsl(var(--glow) / 0.2), 0 0 40px hsl(var(--glow) / 0.1);
+    }
+    50% { 
+      box-shadow: 0 0 40px hsl(var(--glow) / 0.4), 0 0 80px hsl(var(--glow) / 0.2);
+    }
+  }
+
+  .border-gradient {
+    border: 2px solid transparent;
+    background: linear-gradient(var(--card), var(--card)) padding-box,
+                linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent))) border-box;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
 }

@@ -1,0 +1,5 @@
+{
+  "123456": { "firstname": "John", "lastname": "Doe", "formgroup": "Year 10A" },
+  "234567": { "firstname": "Jane", "lastname": "Smith", "formgroup": "Year 11B" },
+  "345678": { "firstname": "Alex", "lastname": "Johnson", "formgroup": "Year 10A" }
+}

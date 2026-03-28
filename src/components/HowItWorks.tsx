@@ -3,49 +3,57 @@ import { Target, TrendingUp, Trophy } from "lucide-react";
 const steps = [
   {
     icon: Target,
-    title: "PREDICT",
-    description: "Pick your outcomes for upcoming matches and events that will happen on the day. Which team will win — make predictions before and during games.",
+    title: "Predict",
+    description: "Pick your outcomes for upcoming matches. Home win, draw, or away — lock it in before kickoff.",
   },
   {
     icon: TrendingUp,
-    title: "CLIMB",
+    title: "Climb",
     description: "Earn points for every correct prediction. The sharper your instincts, the higher you rise.",
   },
   {
     icon: Trophy,
-    title: "WIN",
-    description: "Top the leaderboard. At the end of the tournament winners will recieve their prizes.",
+    title: "Win",
+    description: "Top the leaderboard at the end of the season and claim your share of the prize pool.",
   },
 ];
 
 const HowItWorks = () => {
   return (
-    <section className="py-16 sm:py-24 md:py-32 relative">
-      <div className="container mx-auto">
-        <div className="text-center mb-10 sm:mb-16">
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl uppercase text-foreground mb-4">
+    <section className="py-40 relative">
+      <div className="absolute inset-0 bg-grid opacity-30" />
+      <div className="absolute inset-0 bg-noise pointer-events-none" />
+      
+      <div className="absolute top-1/2 left-0 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
+
+      <div className="relative z-10 container mx-auto px-6">
+        <div className="text-center mb-20">
+          <h2 className="font-display text-5xl sm:text-7xl uppercase text-foreground mb-6 opacity-0 animate-fade-up">
             How it <span className="text-primary text-glow">works</span>
           </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">
+          <p className="text-muted-foreground text-lg max-w-xl mx-auto opacity-0 animate-fade-up" style={{ animationDelay: "100ms" }}>
             Three steps. Zero luck. Pure football knowledge.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
           {steps.map((step, i) => (
             <div
               key={step.title}
-              className="group relative bg-card border border-border rounded-xl p-6 sm:p-8 text-center transition-all duration-300 hover:border-primary/30 hover:shadow-[0_0_30px_hsl(138_100%_59%/0.08)]"
-              style={{ animationDelay: `${i * 150}ms` }}
+              className="group relative glass rounded-3xl p-10 text-center border border-border hover:border-primary/30 transition-all duration-500 hover:shadow-[0_0_60px_hsl(85_100%_55%/0.1)] hover:-translate-y-2 opacity-0 animate-fade-up"
+              style={{ animationDelay: `${200 + i * 100}ms` }}
             >
-              <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-primary/10 text-primary mb-4 sm:mb-6 transition-transform duration-300 group-hover:scale-110">
-                <step.icon className="w-6 h-6 sm:w-7 sm:h-7" />
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              
+              <div className="relative z-10">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 text-primary mb-8 transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_30px_hsl(85_100%_55%/0.3)]">
+                  <step.icon className="w-8 h-8" />
+                </div>
+                <h3 className="font-display text-2xl uppercase text-foreground mb-4">{step.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{step.description}</p>
               </div>
-              <h3 className="font-display text-lg sm:text-xl uppercase text-foreground mb-3">{step.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
 
-              {/* Step number */}
-              <div className="absolute top-4 right-4 font-display text-5xl text-foreground/[0.04]">
+              <div className="absolute top-6 right-6 font-display text-6xl text-foreground/[0.03]">
                 {String(i + 1).padStart(2, "0")}
               </div>
             </div>

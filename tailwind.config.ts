@@ -18,8 +18,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['"Archivo Black"', 'sans-serif'],
-        body: ['Inter', 'sans-serif'],
+        display: ['"Syne"', 'sans-serif'],
+        body: ['"DM Sans"', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -85,19 +85,49 @@ export default {
           to: { height: "0" },
         },
         "fade-up": {
-          "0%": { opacity: "0", transform: "translateY(30px)" },
+          "0%": { opacity: "0", transform: "translateY(40px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        "fade-in": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        "scale-in": {
+          "0%": { opacity: "0", transform: "scale(0.9)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
+        },
+        "slide-in-right": {
+          "0%": { opacity: "0", transform: "translateX(20px)" },
+          "100%": { opacity: "1", transform: "translateX(0)" },
+        },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 20px hsl(138 100% 59% / 0.2)" },
-          "50%": { boxShadow: "0 0 40px hsl(138 100% 59% / 0.4)" },
+          "0%, 100%": { boxShadow: "0 0 20px hsl(85 100% 55% / 0.2)" },
+          "50%": { boxShadow: "0 0 40px hsl(85 100% 55% / 0.4)" },
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
+        "gradient-shift": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-up": "fade-up 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards",
-        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
+        "fade-up": "fade-up 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards",
+        "fade-in": "fade-in 0.6s ease-out forwards",
+        "scale-in": "scale-in 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards",
+        "slide-in-right": "slide-in-right 0.6s ease-out forwards",
+        "pulse-glow": "pulse-glow 3s ease-in-out infinite",
+        float: "float 6s ease-in-out infinite",
+        shimmer: "shimmer 2s infinite linear",
+        "gradient-shift": "gradient-shift 8s ease infinite",
       },
     },
   },

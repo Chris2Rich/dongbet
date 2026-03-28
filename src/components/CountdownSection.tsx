@@ -29,25 +29,32 @@ const CountdownSection = () => {
   ];
 
   return (
-    <section className="py-16 sm:py-24 md:py-32 relative">
-      <div className="container mx-auto text-center">
-        <h2 className="font-display text-3xl sm:text-4xl md:text-5xl uppercase text-foreground mb-4">
+    <section className="py-40 relative overflow-hidden">
+      <div className="absolute inset-0 bg-grid opacity-30" />
+      <div className="absolute inset-0 bg-noise pointer-events-none" />
+      
+      <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 left-1/4 w-[400px] h-[300px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
+
+      <div className="relative z-10 container mx-auto px-6 text-center">
+        <h2 className="font-display text-5xl sm:text-7xl uppercase text-foreground mb-4 opacity-0 animate-fade-up">
           Kicks off <span className="text-primary text-glow">2nd April</span>
         </h2>
-        <p className="text-muted-foreground max-w-xl mx-auto mb-10 sm:mb-16">
+        <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-16 opacity-0 animate-fade-up" style={{ animationDelay: "100ms" }}>
           The competition starts soon. Get ready to prove your football knowledge.
         </p>
 
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 max-w-2xl mx-auto">
-          {units.map((unit) => (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-3xl mx-auto">
+          {units.map((unit, i) => (
             <div
               key={unit.label}
-              className="bg-card border border-border rounded-xl p-4 sm:p-6 transition-all hover:border-primary/30 hover:shadow-[0_0_30px_hsl(138_100%_59%/0.08)]"
+              className="glass rounded-3xl p-6 sm:p-8 border border-border hover:border-primary/30 transition-all duration-500 hover:shadow-[0_0_40px_hsl(85_100%_55%/0.1)] hover:-translate-y-1 opacity-0 animate-fade-up"
+              style={{ animationDelay: `${200 + i * 100}ms` }}
             >
-              <div className="font-display text-3xl sm:text-4xl md:text-5xl text-primary tabular-nums">
+              <div className="font-display text-5xl sm:text-6xl md:text-7xl text-primary tabular-nums mb-2">
                 {String(unit.value).padStart(2, "0")}
               </div>
-              <div className="text-xs text-muted-foreground uppercase tracking-wider mt-2">
+              <div className="text-xs sm:text-sm text-muted-foreground uppercase tracking-widest">
                 {unit.label}
               </div>
             </div>
