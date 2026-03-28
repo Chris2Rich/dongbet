@@ -1,0 +1,108 @@
+{
+  "users": {
+    "123456": {
+      "firstname": "John",
+      "lastname": "Doe",
+      "formgroup": "Year 10A",
+      "points": 100,
+      "predictions": []
+    },
+    "234567": {
+      "firstname": "Jane",
+      "lastname": "Smith",
+      "formgroup": "Year 11B",
+      "points": 100,
+      "predictions": []
+    },
+    "345678": {
+      "firstname": "Alex",
+      "lastname": "Johnson",
+      "formgroup": "Year 10A",
+      "points": 100,
+      "predictions": []
+    },
+    "456789": {
+      "firstname": "Emma",
+      "lastname": "Wilson",
+      "formgroup": "Year 10B",
+      "points": 100,
+      "predictions": []
+    }
+  },
+  "matches": [
+    {
+      "id": "match-1",
+      "homeTeam": "Brazil",
+      "awayTeam": "Jamaica",
+      "homeFlag": "🇧🇷",
+      "awayFlag": "🇯🇲",
+      "competition": "Dong Chen Cup",
+      "startTime": "2026-04-02T10:00:00Z",
+      "status": "open",
+      "markets": [
+        {
+          "id": "market-1",
+          "name": "Match Result",
+          "description": "Who will win the match?",
+          "status": "open",
+          "result": null,
+          "contracts": [
+            { "id": "brazil-win", "name": "Brazil Win", "pool": 0, "odds": 2.0 },
+            { "id": "jamaica-win", "name": "Jamaica Win", "pool": 0, "odds": 2.0 },
+            { "id": "draw", "name": "Draw", "pool": 0, "odds": 2.0 }
+          ],
+          "history": []
+        },
+        {
+          "id": "market-2",
+          "name": "Both Teams to Score",
+          "description": "Will both teams score?",
+          "status": "open",
+          "result": null,
+          "contracts": [
+            { "id": "yes", "name": "Yes", "pool": 0, "odds": 2.0 },
+            { "id": "no", "name": "No", "pool": 0, "odds": 2.0 }
+          ],
+          "history": []
+        },
+        {
+          "id": "market-3",
+          "name": "Total Goals",
+          "description": "Over/Under 2.5 goals",
+          "status": "open",
+          "result": null,
+          "contracts": [
+            { "id": "over", "name": "Over 2.5", "pool": 0, "odds": 2.0 },
+            { "id": "under", "name": "Under 2.5", "pool": 0, "odds": 2.0 }
+          ],
+          "history": []
+        }
+      ]
+    },
+    {
+      "id": "match-2",
+      "homeTeam": "England",
+      "awayTeam": "Spain",
+      "homeFlag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+      "awayFlag": "🇪🇸",
+      "competition": "Dong Chen Cup",
+      "startTime": "2026-04-02T12:00:00Z",
+      "status": "open",
+      "markets": [
+        {
+          "id": "market-4",
+          "name": "Match Result",
+          "description": "Who will win the match?",
+          "status": "open",
+          "result": null,
+          "contracts": [
+            { "id": "england-win", "name": "England Win", "pool": 0, "odds": 2.0 },
+            { "id": "spain-win", "name": "Spain Win", "pool": 0, "odds": 2.0 },
+            { "id": "draw", "name": "Draw", "pool": 0, "odds": 2.0 }
+          ],
+          "history": []
+        }
+      ]
+    }
+  ]
+}

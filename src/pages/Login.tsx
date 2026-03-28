@@ -1,11 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-
-interface UserData {
-  firstname: string;
-  lastname: string;
-  formgroup: string;
-}
+import { login } from "@/lib/api";
 
 const Login = () => {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
@@ -46,20 +41,13 @@ const Login = () => {
     setError("");
 
     try {
-      const response = await fetch("/users.json");
-      const users: Record<string, UserData> = await response.json();
-
-      const user = users[fullCode];
-      if (user) {
-        localStorage.setItem("dongbet_user", JSON.stringify(user));
-        window.location.href = "/dashboard";
-      } else {
-        setError("Invalid code. Please check and try again.");
-        setCode(["", "", "", "", "", ""]);
-        inputRefs.current[0]?.focus();
-      }
-    } catch {
-      setError("Something went wrong. Please try again.");
+      const user = await login(fullCode);
+      localStorage.setItem("dongbet_user", JSON.stringify(user));
+      window.location.href = "/dashboard";
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Invalid code. Please check and try again.");
+      setCode(["", "", "", "", "", ""]);
+      inputRefs.current[0]?.focus();
     } finally {
       setLoading(false);
     }
@@ -87,7 +75,7 @@ const Login = () => {
           </div>
           
           <h1 className="font-display text-4xl sm:text-6xl uppercase text-foreground mb-3 opacity-0 animate-fade-up" style={{ animationDelay: "100ms" }}>
-            DONG<span className="text-primary text-glow">BET</span>
+            DONG<span className="text-primary">BET</span>
           </h1>
           <p className="text-muted-foreground text-base opacity-0 animate-fade-up" style={{ animationDelay: "200ms" }}>
             Enter your 6-digit code
