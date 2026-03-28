@@ -73,32 +73,32 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background bg-grid flex flex-col items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen bg-background bg-grid flex flex-col items-center justify-center px-4 relative overflow-hidden">
       <div className="absolute inset-0 bg-noise pointer-events-none" />
       
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-primary/5 rounded-full blur-[150px] pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-[600px] h-[400px] bg-accent/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[400px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-[300px] h-[200px] bg-accent/5 rounded-full blur-[80px] pointer-events-none" />
 
-      <div className="relative z-10 w-full max-w-md px-6">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-primary/5 mb-8 opacity-0 animate-fade-up">
-            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            <span className="text-sm text-primary/80 font-medium">Tournament 2026</span>
+      <div className="relative z-10 w-full max-w-sm">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded border border-primary/20 bg-primary/5 mb-8 opacity-0 animate-fade-up">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            <span className="text-xs text-primary/80 font-medium">Tournament 2026</span>
           </div>
           
-          <h1 className="font-display text-5xl sm:text-7xl uppercase text-foreground mb-4 opacity-0 animate-fade-up" style={{ animationDelay: "100ms" }}>
+          <h1 className="font-display text-4xl sm:text-6xl uppercase text-foreground mb-3 opacity-0 animate-fade-up" style={{ animationDelay: "100ms" }}>
             DONG<span className="text-primary text-glow">BET</span>
           </h1>
-          <p className="text-muted-foreground text-lg opacity-0 animate-fade-up" style={{ animationDelay: "200ms" }}>
-            Enter your code to join the competition
+          <p className="text-muted-foreground text-base opacity-0 animate-fade-up" style={{ animationDelay: "200ms" }}>
+            Enter your 6-digit code
           </p>
         </div>
 
         <div 
-          className={`glass rounded-2xl p-8 transition-all duration-500 ${isFocused ? 'border-primary/30 shadow-[0_0_60px_hsl(85_100%_55%/0.1)]' : ''} opacity-0 animate-scale-in`}
+          className={`glass p-6 sm:p-8 transition-all duration-300 ${isFocused ? 'border-primary/30' : ''} opacity-0 animate-scale-in`}
           style={{ animationDelay: "300ms" }}
         >
-          <div className="flex justify-center gap-3 mb-8">
+          <div className="flex justify-center gap-2 sm:gap-3 mb-6">
             {code.map((digit, i) => (
               <input
                 key={i}
@@ -112,35 +112,25 @@ const Login = () => {
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
                 disabled={loading}
-                className="w-12 h-16 sm:w-14 sm:h-16 text-center text-2xl font-bold rounded-xl border border-border bg-secondary/50 text-foreground focus:border-primary focus:bg-primary/10 focus:shadow-[0_0_20px_hsl(85_100%_55%/0.2)] outline-none transition-all duration-300"
+                className="w-10 h-12 sm:w-12 sm:h-14 text-xl sm:text-2xl font-bold text-center border border-border bg-secondary/50 text-foreground focus:border-primary focus:bg-primary/10 outline-none transition-all"
               />
             ))}
           </div>
 
           {error && (
-            <p className="text-center text-sm text-red-400 mb-6 animate-fade-up">{error}</p>
+            <p className="text-center text-sm text-red-400 mb-4 animate-fade-up">{error}</p>
           )}
 
           <Button
             onClick={handleManualSubmit}
             disabled={loading || code.join("").length !== 6}
-            className="w-full h-12 text-base font-semibold bg-primary text-background hover:bg-primary/90 rounded-xl transition-all duration-300 hover:shadow-[0_0_30px_hsl(85_100%_55%/0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-11 text-sm font-semibold disabled:opacity-50"
           >
-            {loading ? (
-              <span className="flex items-center gap-2">
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
-                Verifying...
-              </span>
-            ) : (
-              "Continue"
-            )}
+            {loading ? "Verifying..." : "Continue"}
           </Button>
         </div>
 
-        <p className="text-center text-muted-foreground/60 text-sm mt-8 opacity-0 animate-fade-up" style={{ animationDelay: "400ms" }}>
+        <p className="text-center text-muted-foreground/60 text-xs mt-6 opacity-0 animate-fade-up" style={{ animationDelay: "400ms" }}>
           Got your code from your teacher
         </p>
       </div>

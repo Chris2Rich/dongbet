@@ -20,40 +20,38 @@ const steps = [
 
 const HowItWorks = () => {
   return (
-    <section className="py-40 relative">
+    <section className="py-20 sm:py-32 relative">
       <div className="absolute inset-0 bg-grid opacity-30" />
       <div className="absolute inset-0 bg-noise pointer-events-none" />
       
-      <div className="absolute top-1/2 left-0 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/2 left-0 w-[300px] h-[300px] bg-primary/5 rounded-full blur-[80px] pointer-events-none" />
 
-      <div className="relative z-10 container mx-auto px-6">
-        <div className="text-center mb-20">
-          <h2 className="font-display text-5xl sm:text-7xl uppercase text-foreground mb-6 opacity-0 animate-fade-up">
-            How it <span className="text-primary text-glow">works</span>
+      <div className="relative z-10 px-4">
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="font-display text-3xl sm:text-5xl uppercase text-foreground mb-4 opacity-0 animate-fade-up">
+            How it <span className="text-primary">works</span>
           </h2>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto opacity-0 animate-fade-up" style={{ animationDelay: "100ms" }}>
+          <p className="text-muted-foreground text-base max-w-md mx-auto opacity-0 animate-fade-up" style={{ animationDelay: "100ms" }}>
             Three steps. Zero luck. Pure football knowledge.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+        <div className="grid sm:grid-cols-3 gap-4 sm:gap-6 max-w-3xl mx-auto">
           {steps.map((step, i) => (
             <div
               key={step.title}
-              className="group relative glass rounded-3xl p-10 text-center border border-border hover:border-primary/30 transition-all duration-500 hover:shadow-[0_0_60px_hsl(85_100%_55%/0.1)] hover:-translate-y-2 opacity-0 animate-fade-up"
+              className="group relative glass p-5 sm:p-6 text-center border border-border hover:border-primary/30 transition-all duration-300 opacity-0 animate-fade-up"
               style={{ animationDelay: `${200 + i * 100}ms` }}
             >
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              
               <div className="relative z-10">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 text-primary mb-8 transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_30px_hsl(85_100%_55%/0.3)]">
-                  <step.icon className="w-8 h-8" />
+                <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded bg-primary/10 text-primary mb-4 sm:mb-6 transition-all duration-300 group-hover:scale-105">
+                  <step.icon className="w-6 h-6" />
                 </div>
-                <h3 className="font-display text-2xl uppercase text-foreground mb-4">{step.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{step.description}</p>
+                <h3 className="font-display text-lg uppercase text-foreground mb-2">{step.title}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{step.description}</p>
               </div>
 
-              <div className="absolute top-6 right-6 font-display text-6xl text-foreground/[0.03]">
+              <div className="absolute top-3 right-3 font-display text-4xl sm:text-5xl text-foreground/[0.03]">
                 {String(i + 1).padStart(2, "0")}
               </div>
             </div>

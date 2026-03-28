@@ -24,37 +24,37 @@ const CountdownSection = () => {
   const units = [
     { label: "Days", value: timeLeft.days },
     { label: "Hours", value: timeLeft.hours },
-    { label: "Minutes", value: timeLeft.minutes },
-    { label: "Seconds", value: timeLeft.seconds },
+    { label: "Mins", value: timeLeft.minutes },
+    { label: "Secs", value: timeLeft.seconds },
   ];
 
   return (
-    <section className="py-40 relative overflow-hidden">
+    <section className="py-20 sm:py-32 relative overflow-hidden">
       <div className="absolute inset-0 bg-grid opacity-30" />
       <div className="absolute inset-0 bg-noise pointer-events-none" />
       
-      <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 left-1/4 w-[400px] h-[300px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-[300px] h-[300px] bg-accent/5 rounded-full blur-[80px] pointer-events-none" />
+      <div className="absolute bottom-0 left-1/4 w-[250px] h-[200px] bg-primary/5 rounded-full blur-[60px] pointer-events-none" />
 
-      <div className="relative z-10 container mx-auto px-6 text-center">
-        <h2 className="font-display text-5xl sm:text-7xl uppercase text-foreground mb-4 opacity-0 animate-fade-up">
-          Kicks off <span className="text-primary text-glow">2nd April</span>
+      <div className="relative z-10 px-4 text-center">
+        <h2 className="font-display text-3xl sm:text-5xl uppercase text-foreground mb-3 opacity-0 animate-fade-up">
+          Kicks off <span className="text-primary">2nd April</span>
         </h2>
-        <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-16 opacity-0 animate-fade-up" style={{ animationDelay: "100ms" }}>
-          The competition starts soon. Get ready to prove your football knowledge.
+        <p className="text-muted-foreground text-base max-w-md mx-auto mb-10 sm:mb-14 opacity-0 animate-fade-up" style={{ animationDelay: "100ms" }}>
+          The competition starts soon.
         </p>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-3xl mx-auto">
+        <div className="grid grid-cols-4 gap-2 sm:gap-4 max-w-lg mx-auto">
           {units.map((unit, i) => (
             <div
               key={unit.label}
-              className="glass rounded-3xl p-6 sm:p-8 border border-border hover:border-primary/30 transition-all duration-500 hover:shadow-[0_0_40px_hsl(85_100%_55%/0.1)] hover:-translate-y-1 opacity-0 animate-fade-up"
+              className="glass p-3 sm:p-5 border border-border hover:border-primary/30 transition-all duration-300 opacity-0 animate-fade-up"
               style={{ animationDelay: `${200 + i * 100}ms` }}
             >
-              <div className="font-display text-5xl sm:text-6xl md:text-7xl text-primary tabular-nums mb-2">
+              <div className="font-display text-2.5rem sm:text-4xl md:text-5xl text-primary tabular-nums">
                 {String(unit.value).padStart(2, "0")}
               </div>
-              <div className="text-xs sm:text-sm text-muted-foreground uppercase tracking-widest">
+              <div className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">
                 {unit.label}
               </div>
             </div>
