@@ -1,4 +1,4 @@
-import { kv } from '@vercel/kv';
+import { getRedis } from './_redis';
 
 export const runtime = 'edge';
 
@@ -10,11 +10,14 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Invalid code' }, { status: 400 });
     }
 
-    const user = await kv.get(`user:${code}`);
+    const redis = getRedis();
+    const userJson = await redis.get(`user:${code}`);
 
-    if (!user) {
+    if (!userJson) {
       return Response.json({ error: 'Invalid code' }, { status: 401 });
     }
+
+    const user = JSON.parse(userJson);
 
     return Response.json({
       success: true,

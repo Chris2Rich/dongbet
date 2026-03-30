@@ -1,4 +1,4 @@
-import { kv } from '@vercel/kv';
+import { getRedis } from './_redis';
 
 export const runtime = 'edge';
 
@@ -26,17 +26,21 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Minimum stake is 1 point' }, { status: 400 });
     }
 
-    const user = await kv.get(`user:${code}`);
+    const redis = getRedis();
 
-    if (!user) {
+    const userJson = await redis.get(`user:${code}`);
+    if (!userJson) {
       return Response.json({ error: 'User not found' }, { status: 404 });
     }
+
+    const user = JSON.parse(userJson);
 
     if (user.points < stakeNum) {
       return Response.json({ error: 'Insufficient points' }, { status: 400 });
     }
 
-    const matches = await kv.get('matches') || [];
+    const matchesJson = await redis.get('matches');
+    const matches = matchesJson ? JSON.parse(matchesJson) : [];
     
     const matchIndex = matches.findIndex((m: any) => m.id === matchId);
     if (matchIndex === -1) {
@@ -91,16 +95,13 @@ export async function POST(request: Request) {
     
     user.predictions = [...(user.predictions || []), prediction];
 
-    // Update contract pool
     market.contracts[contractIndex].pool += stakeNum;
     
-    // Recalculate all probabilities in market
     const newProbabilities = calculateContractProbability(market.contracts);
     market.contracts.forEach((c: any, i: number) => {
       c.probability = newProbabilities[i];
     });
 
-    // Record historical probabilities for this market
     const history = market.history || [];
     const contractProbabilities: Record<string, number> = {};
     market.contracts.forEach((c: any) => {
@@ -113,9 +114,8 @@ export async function POST(request: Request) {
     });
     market.history = history;
 
-    // Save user and matches separately
-    await kv.set(`user:${code}`, user);
-    await kv.set('matches', matches);
+    await redis.set(`user:${code}`, JSON.stringify(user));
+    await redis.set('matches', JSON.stringify(matches));
 
     return Response.json({
       success: true,

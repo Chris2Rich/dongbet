@@ -1,4 +1,4 @@
-import { kv } from '@vercel/kv';
+import { getRedis } from './_redis';
 
 export const runtime = 'edge';
 
@@ -29,6 +29,8 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Missing action' }, { status: 400 });
     }
 
+    const redis = getRedis();
+
     if (action === 'createUser') {
       const { code, firstname, lastname, formgroup, points = 100 } = data;
       
@@ -36,7 +38,7 @@ export async function POST(request: Request) {
         return Response.json({ error: 'Missing required fields' }, { status: 400 });
       }
 
-      const userExists = await kv.exists(`user:${code}`);
+      const userExists = await redis.exists(`user:${code}`);
       if (userExists) {
         return Response.json({ error: 'User already exists' }, { status: 400 });
       }
@@ -50,8 +52,8 @@ export async function POST(request: Request) {
         predictions: []
       };
 
-      await kv.set(`user:${code}`, newUser);
-      await kv.sadd('users:set', code);
+      await redis.set(`user:${code}`, JSON.stringify(newUser));
+      await redis.sAdd('users:set', code);
 
       return Response.json({ success: true, user: newUser });
     }
@@ -67,42 +69,46 @@ export async function POST(request: Request) {
         return Response.json({ error: 'Invalid points value' }, { status: 400 });
       }
 
-      const user = await kv.get<User>(`user:${code}`);
+      const userJson = await redis.get(`user:${code}`);
       
-      if (!user) {
+      if (!userJson) {
         return Response.json({ error: 'User not found' }, { status: 404 });
       }
 
+      const user = JSON.parse(userJson);
       user.points = points;
-      await kv.set(`user:${code}`, user);
+      await redis.set(`user:${code}`, JSON.stringify(user));
 
       return Response.json({ success: true, user });
     }
 
     if (action === 'getAllUsers') {
-      const userCodes = await kv.smembers('users:set');
+      const userCodes = await redis.sMembers('users:set');
       
       if (!userCodes || userCodes.length === 0) {
         return Response.json({ users: [] });
       }
 
       const userKeys = userCodes.map((c: string) => `user:${c}`);
-      const usersArray = await kv.mget<User[]>(...userKeys);
+      const usersArray = await redis.mGet(userKeys);
 
-      const validUsers = usersArray.filter(Boolean);
+      const validUsers = usersArray
+        .filter(Boolean)
+        .map((u: string) => JSON.parse(u));
 
       return Response.json({ users: validUsers });
     }
 
     if (action === 'getAllMatches') {
-      const matches = await kv.get('matches');
-      return Response.json({ matches: matches || [] });
+      const matchesJson = await redis.get('matches');
+      const matches = matchesJson ? JSON.parse(matchesJson) : [];
+      return Response.json({ matches });
     }
 
     return Response.json({ error: 'Unknown action' }, { status: 400 });
     
   } catch (error) {
-    console.error('Admin KV error:', error);
+    console.error('Admin Redis error:', error);
     return Response.json({ error: 'Server error' }, { status: 500 });
   }
 }

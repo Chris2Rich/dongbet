@@ -1,4 +1,4 @@
-import { kv } from '@vercel/kv';
+import { getRedis } from './_redis';
 
 export const runtime = 'edge';
 
@@ -11,11 +11,14 @@ export async function GET(request: Request) {
       return Response.json({ error: 'Code required' }, { status: 400 });
     }
 
-    const user = await kv.get(`user:${code}`);
+    const redis = getRedis();
+    const userJson = await redis.get(`user:${code}`);
 
-    if (!user) {
+    if (!userJson) {
       return Response.json({ error: 'User not found' }, { status: 404 });
     }
+
+    const user = JSON.parse(userJson);
 
     return Response.json({
       code,
@@ -39,11 +42,14 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Missing data' }, { status: 400 });
     }
 
-    const user = await kv.get(`user:${code}`);
+    const redis = getRedis();
+    const userJson = await redis.get(`user:${code}`);
 
-    if (!user) {
+    if (!userJson) {
       return Response.json({ error: 'User not found' }, { status: 404 });
     }
+
+    const user = JSON.parse(userJson);
 
     const existingPredictions = user.predictions || [];
     const alreadyPredicted = existingPredictions.some((p: any) => p.matchId === prediction.matchId);
@@ -58,7 +64,7 @@ export async function POST(request: Request) {
       pointsEarned: 0
     }];
 
-    await kv.set(`user:${code}`, user);
+    await redis.set(`user:${code}`, JSON.stringify(user));
 
     return Response.json({ success: true });
   } catch (error) {

@@ -1,4 +1,4 @@
-import { kv } from '@vercel/kv';
+import { getRedis } from './_redis';
 
 export const runtime = 'edge';
 
@@ -10,7 +10,10 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Missing matchId, marketId, or contractId' }, { status: 400 });
     }
 
-    const matches = await kv.get('matches') || [];
+    const redis = getRedis();
+
+    const matchesJson = await redis.get('matches');
+    const matches = matchesJson ? JSON.parse(matchesJson) : [];
 
     const matchIndex = matches.findIndex((m: any) => m.id === matchId);
     if (matchIndex === -1) {
@@ -37,18 +40,18 @@ export async function POST(request: Request) {
     market.status = 'resolved';
     market.result = contractId;
 
-    // Get all users
-    const userCodes = await kv.smembers('users:set');
+    const userCodes = await redis.sMembers('users:set');
     let settledCount = 0;
     let totalPayout = 0;
 
     if (userCodes && userCodes.length > 0) {
       const userKeys = userCodes.map((c: string) => `user:${c}`);
-      const usersArray = await kv.mget(...userKeys);
+      const usersArray = await redis.mGet(userKeys);
 
-      for (const user of usersArray) {
-        if (!user) continue;
+      for (const userJson of usersArray) {
+        if (!userJson) continue;
         
+        const user = JSON.parse(userJson);
         const predictions = user.predictions || [];
         let userUpdated = false;
         
@@ -68,12 +71,12 @@ export async function POST(request: Request) {
         }
 
         if (userUpdated) {
-          await kv.set(`user:${user.code}`, user);
+          await redis.set(`user:${user.code}`, JSON.stringify(user));
         }
       }
     }
 
-    await kv.set('matches', matches);
+    await redis.set('matches', JSON.stringify(matches));
 
     return Response.json({
       success: true,
