@@ -36,7 +36,7 @@ const HeroSection = () => {
           <span className="text-[11px] sm:text-xs text-muted-foreground">2nd April</span>
         </div>
 
-        <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl uppercase leading-[0.85] tracking-tight mb-4 sm:mb-6 opacity-0 animate-fade-up" style={{ animationDelay: "100ms" }}>
+        <h1 className="font-display text-5xl sm:text-3xl md:text-7xl lg:text-8xl uppercase leading-[0.85] tracking-tight mb-4 sm:mb-6 opacity-0 animate-fade-up" style={{ animationDelay: "100ms" }}>
           <span className="text-foreground">DONG</span>
           <span className="text-primary">BET</span>
         </h1>
