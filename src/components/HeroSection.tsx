@@ -23,7 +23,7 @@ const HeroSection = () => {
       <div className="absolute bottom-1/3 right-1/4 w-40 sm:w-[250px] h-40 sm:h-[250px] bg-accent/8 rounded-full blur-[50px] sm:blur-[60px] pointer-events-none" />
 
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
-        <h2 className="font-display text-[50vw] leading-none tracking-tighter text-foreground/[0.015] uppercase">
+        <h2 className="font-display text-[30vw] sm:text-[40vw] md:text-[50vw] leading-none tracking-tighter text-foreground/[0.015] uppercase whitespace-nowrap">
           DONGBET
         </h2>
       </div>
