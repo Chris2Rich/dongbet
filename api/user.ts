@@ -1,4 +1,4 @@
-import { get, put } from '@vercel/blob';
+import { kv } from '@vercel/kv';
 
 export const runtime = 'edge';
 
@@ -11,16 +11,7 @@ export async function GET(request: Request) {
       return Response.json({ error: 'Code required' }, { status: 400 });
     }
 
-    const blob = await get('users.json', { 
-      access: 'private',
-      token: process.env.BLOB_READ_WRITE_TOKEN 
-    });
-
-    const text = await blob.text();
-    const data = JSON.parse(text);
-    const users = data.users || {};
-
-    const user = users[code];
+    const user = await kv.get(`user:${code}`);
 
     if (!user) {
       return Response.json({ error: 'User not found' }, { status: 404 });
@@ -48,42 +39,26 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Missing data' }, { status: 400 });
     }
 
-    const blob = await get('users.json', { 
-      access: 'private',
-      token: process.env.BLOB_READ_WRITE_TOKEN 
-    });
+    const user = await kv.get(`user:${code}`);
 
-    const text = await blob.text();
-    const data = JSON.parse(text);
-    const users = data.users || {};
-
-    if (!users[code]) {
+    if (!user) {
       return Response.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Add prediction
-    const existingPredictions = users[code].predictions || [];
+    const existingPredictions = user.predictions || [];
     const alreadyPredicted = existingPredictions.some((p: any) => p.matchId === prediction.matchId);
     
     if (alreadyPredicted) {
       return Response.json({ error: 'Already predicted' }, { status: 400 });
     }
 
-    users[code].predictions = [...existingPredictions, {
+    user.predictions = [...existingPredictions, {
       ...prediction,
       timestamp: new Date().toISOString(),
       pointsEarned: 0
     }];
 
-    // Save back to blob
-    const updatedData = JSON.stringify({ ...data, users }, null, 2);
-    
-    await put('users.json', updatedData, {
-      access: 'private',
-      token: process.env.BLOB_READ_WRITE_TOKEN,
-      contentType: 'application/json',
-      allowOverwrite: true
-    });
+    await kv.set(`user:${code}`, user);
 
     return Response.json({ success: true });
   } catch (error) {

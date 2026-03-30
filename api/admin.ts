@@ -1,12 +1,20 @@
-import { get, put } from '@vercel/blob';
+import { kv } from '@vercel/kv';
 
 export const runtime = 'edge';
 
-const BLOB_PATH = 'users.json';
 const ADMIN_SECRET = '051007';
 
 function verifySecret(secret: string): boolean {
   return secret === ADMIN_SECRET;
+}
+
+interface User {
+  code: string;
+  firstname: string;
+  lastname: string;
+  formgroup: string;
+  points: number;
+  predictions: any[];
 }
 
 export async function POST(request: Request) {
@@ -21,15 +29,6 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Missing action' }, { status: 400 });
     }
 
-    const blob = await get(BLOB_PATH, { 
-      access: 'private',
-      token: process.env.BLOB_READ_WRITE_TOKEN 
-    });
-
-    const text = await blob.text();
-    const storage = JSON.parse(text);
-    const users = storage.users || {};
-
     if (action === 'createUser') {
       const { code, firstname, lastname, formgroup, points = 100 } = data;
       
@@ -37,11 +36,13 @@ export async function POST(request: Request) {
         return Response.json({ error: 'Missing required fields' }, { status: 400 });
       }
 
-      if (users[code]) {
+      const userExists = await kv.exists(`user:${code}`);
+      if (userExists) {
         return Response.json({ error: 'User already exists' }, { status: 400 });
       }
 
-      users[code] = {
+      const newUser: User = {
+        code,
         firstname,
         lastname,
         formgroup,
@@ -49,53 +50,59 @@ export async function POST(request: Request) {
         predictions: []
       };
 
-      await put(BLOB_PATH, JSON.stringify({ users, matches: storage.matches }, null, 2), {
-        access: 'private',
-        token: process.env.BLOB_READ_WRITE_TOKEN,
-        contentType: 'application/json',
-        allowOverwrite: true
-      });
+      await kv.set(`user:${code}`, newUser);
+      await kv.sadd('users:set', code);
 
-      return Response.json({ success: true, user: users[code] });
+      return Response.json({ success: true, user: newUser });
     }
 
     if (action === 'updateUserPoints') {
       const { code, points } = data;
       
-      if (!code || !users[code]) {
-        return Response.json({ error: 'User not found' }, { status: 404 });
+      if (!code) {
+        return Response.json({ error: 'Missing user code' }, { status: 400 });
       }
 
       if (typeof points !== 'number') {
         return Response.json({ error: 'Invalid points value' }, { status: 400 });
       }
 
-      users[code].points = points;
+      const user = await kv.get<User>(`user:${code}`);
+      
+      if (!user) {
+        return Response.json({ error: 'User not found' }, { status: 404 });
+      }
 
-      await put(BLOB_PATH, JSON.stringify({ users, matches: storage.matches }, null, 2), {
-        access: 'private',
-        token: process.env.BLOB_READ_WRITE_TOKEN,
-        contentType: 'application/json',
-        allowOverwrite: true
-      });
+      user.points = points;
+      await kv.set(`user:${code}`, user);
 
-      return Response.json({ success: true, user: users[code] });
+      return Response.json({ success: true, user });
     }
 
     if (action === 'getAllUsers') {
-      return Response.json({ users: Object.entries(users).map(([code, user]: [string, any]) => ({
-        code,
-        ...user
-      }))});
+      const userCodes = await kv.smembers('users:set');
+      
+      if (!userCodes || userCodes.length === 0) {
+        return Response.json({ users: [] });
+      }
+
+      const userKeys = userCodes.map((c: string) => `user:${c}`);
+      const usersArray = await kv.mget<User[]>(...userKeys);
+
+      const validUsers = usersArray.filter(Boolean);
+
+      return Response.json({ users: validUsers });
     }
 
     if (action === 'getAllMatches') {
-      return Response.json({ matches: storage.matches || [] });
+      const matches = await kv.get('matches');
+      return Response.json({ matches: matches || [] });
     }
 
     return Response.json({ error: 'Unknown action' }, { status: 400 });
+    
   } catch (error) {
-    console.error('Admin error:', error);
+    console.error('Admin KV error:', error);
     return Response.json({ error: 'Server error' }, { status: 500 });
   }
 }

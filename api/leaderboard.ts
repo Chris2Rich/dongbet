@@ -1,22 +1,22 @@
-import { get } from '@vercel/blob';
+import { kv } from '@vercel/kv';
 
 export const runtime = 'edge';
 
 export async function GET() {
   try {
-    const blob = await get('users.json', { 
-      access: 'private',
-      token: process.env.BLOB_READ_WRITE_TOKEN 
-    });
+    const userCodes = await kv.smembers('users:set');
+    
+    if (!userCodes || userCodes.length === 0) {
+      return Response.json([]);
+    }
 
-    const text = await blob.text();
-    const data = JSON.parse(text);
-    const users = data.users || {};
+    const userKeys = userCodes.map((code: string) => `user:${code}`);
+    const usersArray = await kv.mget(...userKeys);
 
-    // Convert to array and sort by points
-    const leaderboard = Object.entries(users)
-      .map(([code, user]: [string, any]) => ({
-        code,
+    const leaderboard = (usersArray || [])
+      .filter(Boolean)
+      .map((user: any) => ({
+        code: user.code,
         firstname: user.firstname,
         lastname: user.lastname,
         formgroup: user.formgroup,

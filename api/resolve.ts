@@ -1,8 +1,6 @@
-import { get, put } from '@vercel/blob';
+import { kv } from '@vercel/kv';
 
 export const runtime = 'edge';
-
-const BLOB_PATH = 'users.json';
 
 export async function POST(request: Request) {
   try {
@@ -12,15 +10,7 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Missing matchId, marketId, or contractId' }, { status: 400 });
     }
 
-    const blob = await get(BLOB_PATH, { 
-      access: 'private',
-      token: process.env.BLOB_READ_WRITE_TOKEN 
-    });
-
-    const text = await blob.text();
-    const data = JSON.parse(text);
-    const users = data.users || {};
-    const matches = data.matches || [];
+    const matches = await kv.get('matches') || [];
 
     const matchIndex = matches.findIndex((m: any) => m.id === matchId);
     if (matchIndex === -1) {
@@ -47,34 +37,43 @@ export async function POST(request: Request) {
     market.status = 'resolved';
     market.result = contractId;
 
+    // Get all users
+    const userCodes = await kv.smembers('users:set');
     let settledCount = 0;
     let totalPayout = 0;
 
-    for (const [code, user] of Object.entries(users)) {
-      const userData = user as any;
-      const predictions = userData.predictions || [];
-      
-      for (const prediction of predictions) {
-        if (prediction.matchId === matchId && prediction.marketId === marketId) {
-          if (prediction.contractId === contractId) {
-            const winnings = Math.round(prediction.stake * prediction.probability * 10) / 10;
-            userData.points += winnings;
-            prediction.pointsEarned = winnings;
-            totalPayout += winnings;
-          } else {
-            prediction.pointsEarned = 0;
+    if (userCodes && userCodes.length > 0) {
+      const userKeys = userCodes.map((c: string) => `user:${c}`);
+      const usersArray = await kv.mget(...userKeys);
+
+      for (const user of usersArray) {
+        if (!user) continue;
+        
+        const predictions = user.predictions || [];
+        let userUpdated = false;
+        
+        for (const prediction of predictions) {
+          if (prediction.matchId === matchId && prediction.marketId === marketId) {
+            if (prediction.contractId === contractId) {
+              const winnings = Math.round(prediction.stake * prediction.probability * 10) / 10;
+              user.points += winnings;
+              prediction.pointsEarned = winnings;
+              totalPayout += winnings;
+            } else {
+              prediction.pointsEarned = 0;
+            }
+            settledCount++;
+            userUpdated = true;
           }
-          settledCount++;
+        }
+
+        if (userUpdated) {
+          await kv.set(`user:${user.code}`, user);
         }
       }
     }
 
-    await put(BLOB_PATH, JSON.stringify({ users, matches }, null, 2), {
-      access: 'private',
-      token: process.env.BLOB_READ_WRITE_TOKEN,
-      contentType: 'application/json',
-      allowOverwrite: true
-    });
+    await kv.set('matches', matches);
 
     return Response.json({
       success: true,

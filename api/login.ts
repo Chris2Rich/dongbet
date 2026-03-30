@@ -1,4 +1,4 @@
-import { get } from '@vercel/blob';
+import { kv } from '@vercel/kv';
 
 export const runtime = 'edge';
 
@@ -10,20 +10,7 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Invalid code' }, { status: 400 });
     }
 
-    const blob = await get('users.json', { 
-      access: 'private',
-      token: process.env.BLOB_READ_WRITE_TOKEN 
-    });
-
-    if (!blob) {
-      return Response.json({ error: 'Data not found' }, { status: 500 });
-    }
-
-    const text = await blob.text();
-    const data = JSON.parse(text);
-    const users = data.users || {};
-
-    const user = users[code];
+    const user = await kv.get(`user:${code}`);
 
     if (!user) {
       return Response.json({ error: 'Invalid code' }, { status: 401 });

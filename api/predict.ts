@@ -1,8 +1,6 @@
-import { get, put } from '@vercel/blob';
+import { kv } from '@vercel/kv';
 
 export const runtime = 'edge';
-
-const BLOB_PATH = 'users.json';
 
 function calculateContractProbability(contracts: { pool: number }[]) {
   const total = contracts.reduce((sum, c) => sum + c.pool, 0);
@@ -28,26 +26,18 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Minimum stake is 1 point' }, { status: 400 });
     }
 
-    const blob = await get(BLOB_PATH, { 
-      access: 'private',
-      token: process.env.BLOB_READ_WRITE_TOKEN 
-    });
+    const user = await kv.get(`user:${code}`);
 
-    const text = await blob.text();
-    const data = JSON.parse(text);
-    const users = data.users || {};
-    const matches = data.matches || [];
-
-    if (!users[code]) {
+    if (!user) {
       return Response.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const user = users[code];
-    
     if (user.points < stakeNum) {
       return Response.json({ error: 'Insufficient points' }, { status: 400 });
     }
 
+    const matches = await kv.get('matches') || [];
+    
     const matchIndex = matches.findIndex((m: any) => m.id === matchId);
     if (matchIndex === -1) {
       return Response.json({ error: 'Match not found' }, { status: 404 });
@@ -123,12 +113,9 @@ export async function POST(request: Request) {
     });
     market.history = history;
 
-    await put(BLOB_PATH, JSON.stringify({ users, matches }, null, 2), {
-      access: 'private',
-      token: process.env.BLOB_READ_WRITE_TOKEN,
-      contentType: 'application/json',
-      allowOverwrite: true
-    });
+    // Save user and matches separately
+    await kv.set(`user:${code}`, user);
+    await kv.set('matches', matches);
 
     return Response.json({
       success: true,
