@@ -39,6 +39,7 @@ const FooterSection = () => {
             <div className="flex items-center gap-5 text-xs sm:text-sm text-muted-foreground order-2 sm:order-none">
               <a href="#" className="hover:text-primary transition-colors">Rules</a>
               <a href="mailto:19czaccaria@thelangton.org.uk" className="hover:text-primary transition-colors">Contact</a>
+              <a href="/admin" className="text-[10px] opacity-30 hover:opacity-100 transition-opacity">admin</a>
             </div>
             <span className="text-[10px] sm:text-xs text-muted-foreground order-3 sm:order-none">© 2026</span>
           </div>

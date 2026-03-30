@@ -4,14 +4,14 @@ export const runtime = 'edge';
 
 const BLOB_PATH = 'users.json';
 
-function calculateContractOdds(contracts: { pool: number }[]) {
+function calculateContractProbability(contracts: { pool: number }[]) {
   const total = contracts.reduce((sum, c) => sum + c.pool, 0);
   if (total === 0) {
-    return contracts.map(() => 2.0);
+    return contracts.map(() => 0.5);
   }
   return contracts.map(c => {
-    const odds = total / Math.max(c.pool, 1);
-    return Math.round(odds * 100) / 100;
+    const probability = Math.max(c.pool, 1) / total;
+    return Math.round(probability * 100) / 100;
   });
 }
 
@@ -83,8 +83,8 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Already predicted this market' }, { status: 400 });
     }
 
-    const currentOdds = market.contracts[contractIndex].odds;
-    const potentialWin = Math.round(stakeNum * currentOdds * 10) / 10;
+    const currentProbability = market.contracts[contractIndex].probability;
+    const potentialWin = Math.round(stakeNum * currentProbability * 10) / 10;
 
     user.points -= stakeNum;
     
@@ -93,7 +93,7 @@ export async function POST(request: Request) {
       marketId,
       contractId,
       stake: stakeNum,
-      odds: currentOdds,
+      probability: currentProbability,
       potentialWin,
       pointsEarned: null,
       timestamp: new Date().toISOString()
@@ -104,21 +104,22 @@ export async function POST(request: Request) {
     // Update contract pool
     market.contracts[contractIndex].pool += stakeNum;
     
-    // Recalculate all odds in market
-    const newOdds = calculateContractOdds(market.contracts);
+    // Recalculate all probabilities in market
+    const newProbabilities = calculateContractProbability(market.contracts);
     market.contracts.forEach((c: any, i: number) => {
-      c.odds = newOdds[i];
+      c.probability = newProbabilities[i];
     });
 
-    // Record historical odds for this market
+    // Record historical probabilities for this market
     const history = market.history || [];
-    const contractOdds: Record<string, number> = {};
+    const contractProbabilities: Record<string, number> = {};
     market.contracts.forEach((c: any) => {
-      contractOdds[c.id] = c.odds;
+      contractProbabilities[c.id] = c.probability;
     });
     history.push({
       timestamp: new Date().toISOString(),
-      contracts: contractOdds
+      contracts: contractProbabilities,
+      type: 'probability'
     });
     market.history = history;
 

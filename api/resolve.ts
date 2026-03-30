@@ -57,7 +57,7 @@ export async function POST(request: Request) {
       for (const prediction of predictions) {
         if (prediction.matchId === matchId && prediction.marketId === marketId) {
           if (prediction.contractId === contractId) {
-            const winnings = Math.round(prediction.stake * prediction.odds * 10) / 10;
+            const winnings = Math.round(prediction.stake * prediction.probability * 10) / 10;
             userData.points += winnings;
             prediction.pointsEarned = winnings;
             totalPayout += winnings;

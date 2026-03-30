@@ -12,7 +12,7 @@ export interface Prediction {
   marketId: string;
   contractId: string;
   stake: number;
-  odds: number;
+  probability: number;
   potentialWin: number;
   pointsEarned: number | null;
   timestamp: string;
@@ -21,6 +21,7 @@ export interface Prediction {
 export interface OddsSnapshot {
   timestamp: string;
   contracts: Record<string, number>;
+  type: 'probability';
 }
 
 export interface Contract {
@@ -28,7 +29,7 @@ export interface Contract {
   name: string;
   description?: string;
   pool: number;
-  odds: number;
+  probability: number;
 }
 
 export interface Market {

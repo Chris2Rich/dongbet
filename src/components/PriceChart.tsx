@@ -6,7 +6,7 @@ interface PriceChartProps {
   contracts: Contract[];
 }
 
-const oddsToProb = (odds: number) => Math.round((1 / odds) * 100) / 100;
+
 
 const COLORS = ['#b8ff4d', '#facc15', '#f5b829', '#ef4444', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6'];
 
@@ -22,8 +22,7 @@ const PriceChart = ({ history, contracts }: PriceChartProps) => {
   const chartData = history.map((snapshot, i) => {
     const data: Record<string, any> = { time: i + 1, timestamp: snapshot.timestamp };
     contracts.forEach((contract, idx) => {
-      const prob = snapshot.contracts[contract.id] ? oddsToProb(snapshot.contracts[contract.id]) : 0;
-      data[contract.id] = prob;
+      data[contract.id] = snapshot.contracts[contract.id] || 0;
     });
     return data;
   });

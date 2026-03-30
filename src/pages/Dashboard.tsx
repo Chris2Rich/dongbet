@@ -253,7 +253,7 @@ const Dashboard = () => {
                                       <span className="text-primary font-medium">
                                         {market.contracts.find(c => c.id === prediction.contractId)?.name}
                                       </span>
-                                      <span className="text-muted-foreground"> @ {prediction.odds}x</span>
+                                      <span className="text-muted-foreground"> @ {(prediction.probability * 100).toFixed(0)}%</span>
                                     </div>
                                     <span className="text-primary text-[11px] sm:text-xs">{prediction.stake} pts</span>
                                   </div>
@@ -270,7 +270,7 @@ const Dashboard = () => {
                                           <span className="block text-muted-foreground text-[9px] sm:text-[10px] mb-0.5 truncate">
                                             {contract.name}
                                           </span>
-                                          <span className="text-primary">{contract.odds}x</span>
+                                          <span className="text-primary">{(contract.probability * 100).toFixed(0)}%</span>
                                         </button>
                                       ))}
                                     </div>
