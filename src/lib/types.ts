@@ -13,6 +13,7 @@ export interface Prediction {
   contractId: string;
   stake: number;
   probability: number;
+  odds: number;
   potentialWin: number;
   pointsEarned: number | null;
   timestamp: string;
@@ -30,6 +31,7 @@ export interface Contract {
   description?: string;
   pool: number;
   probability: number;
+  odds: number;
 }
 
 export interface Market {

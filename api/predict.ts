@@ -2,15 +2,21 @@ import { getSupabase } from './db.js';
 
 
 
-function calculateContractProbability(contracts: { pool: number }[]) {
+function calculateContractProbabilities(contracts: { pool: number }[]) {
   const total = contracts.reduce((sum, c) => sum + c.pool, 0);
   if (total === 0) {
-    return contracts.map(() => 0.5);
+    const equalProb = 1 / contracts.length;
+    return contracts.map(() => Math.round(equalProb * 1000) / 1000);
   }
   return contracts.map(c => {
-    const probability = Math.max(c.pool, 1) / total;
-    return Math.round(probability * 100) / 100;
+    const probability = c.pool / total;
+    return Math.round(probability * 1000) / 1000;
   });
+}
+
+function getContractOdds(pool: number, totalPool: number): number {
+  if (pool === 0) return 2.0;
+  return Math.round((totalPool / pool) * 100) / 100;
 }
 
 export async function POST(request: Request) {
@@ -82,8 +88,11 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Already predicted this market' }, { status: 400 });
     }
 
-    const currentProbability = market.contracts[contractIndex].probability;
-    const potentialWin = Math.round(stakeNum * currentProbability * 10) / 10;
+    const totalPool = market.contracts.reduce((sum: number, c: any) => sum + c.pool, 0);
+    const contractPool = market.contracts[contractIndex].pool;
+    const currentOdds = contractPool > 0 ? Math.round((totalPool / contractPool) * 100) / 100 : 2.0;
+    const currentProbability = contractPool > 0 ? Math.round((contractPool / totalPool) * 1000) / 1000 : 0.5;
+    const potentialWin = Math.round(stakeNum * currentOdds * 100) / 100;
 
     user.points -= stakeNum;
     
@@ -92,6 +101,7 @@ export async function POST(request: Request) {
       marketId,
       contractId,
       stake: stakeNum,
+      odds: currentOdds,
       probability: currentProbability,
       potentialWin,
       pointsEarned: null,
@@ -102,9 +112,11 @@ export async function POST(request: Request) {
 
     market.contracts[contractIndex].pool += stakeNum;
     
-    const newProbabilities = calculateContractProbability(market.contracts);
+    const newProbabilities = calculateContractProbabilities(market.contracts);
+    const newTotal = market.contracts.reduce((sum: number, c: any) => sum + c.pool, 0);
     market.contracts.forEach((c: any, i: number) => {
       c.probability = newProbabilities[i];
+      c.odds = getContractOdds(c.pool, newTotal);
     });
 
     const history = market.history || [];

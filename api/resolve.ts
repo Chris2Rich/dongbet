@@ -39,6 +39,10 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Contract not found' }, { status: 404 });
     }
 
+    const winningContract = market.contracts[winningContractIndex];
+    const totalPool = market.contracts.reduce((sum: number, c: any) => sum + c.pool, 0);
+    const winningPool = winningContract.pool;
+
     market.status = 'resolved';
     market.result = contractId;
 
@@ -57,7 +61,8 @@ export async function POST(request: Request) {
         for (const prediction of predictions) {
           if (prediction.matchId === matchId && prediction.marketId === marketId) {
             if (prediction.contractId === contractId) {
-              const winnings = Math.round(prediction.stake * prediction.probability * 10) / 10;
+              const payoutMultiplier = winningPool > 0 ? totalPool / winningPool : 1;
+              const winnings = Math.round(prediction.stake * payoutMultiplier * 100) / 100;
               user.points += winnings;
               prediction.pointsEarned = winnings;
               totalPayout += winnings;
