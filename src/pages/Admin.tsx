@@ -12,12 +12,14 @@ interface User {
   lastname: string;
   formgroup: string;
   points: number;
+  predictions: any[];
 }
 
 interface Contract {
   id: string;
   name: string;
   pool: number;
+  odds: number;
   probability: number;
 }
 
@@ -52,6 +54,28 @@ const Admin = () => {
   
   const [newUser, setNewUser] = useState({ code: "", firstname: "", lastname: "", formgroup: "" });
   const [creatingUser, setCreatingUser] = useState(false);
+
+  const [newMatch, setNewMatch] = useState({
+    id: "",
+    homeTeam: "",
+    awayTeam: "",
+    homeFlag: "",
+    awayFlag: "",
+    competition: "",
+    startTime: "",
+  });
+  const [creatingMatch, setCreatingMatch] = useState(false);
+
+  const [newMarket, setNewMarket] = useState<{ matchId: string; name: string; description: string }>({
+    matchId: "",
+    name: "",
+    description: "",
+  });
+  const [newContract, setNewContract] = useState<{ matchId: string; marketId: string; name: string }>({
+    matchId: "",
+    marketId: "",
+    name: "",
+  });
 
   const fetchData = async () => {
     try {
@@ -117,6 +141,172 @@ const Admin = () => {
       toast.error("Failed to create user");
     } finally {
       setCreatingUser(false);
+    }
+  };
+
+  const handleCreateMatch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreatingMatch(true);
+    
+    try {
+      const res = await fetch("/api/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ secret: ADMIN_SECRET, action: "createMatch", ...newMatch }),
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        toast.success(`Match ${newMatch.homeTeam} vs ${newMatch.awayTeam} created`);
+        setNewMatch({ id: "", homeTeam: "", awayTeam: "", homeFlag: "", awayFlag: "", competition: "", startTime: "" });
+        fetchData();
+      } else {
+        toast.error(data.error || "Failed to create match");
+      }
+    } catch (err) {
+      toast.error("Failed to create match");
+    } finally {
+      setCreatingMatch(false);
+    }
+  };
+
+  const handleDeleteMatch = async (matchId: string) => {
+    if (!confirm("Delete this match and all its markets?")) return;
+    
+    try {
+      const res = await fetch("/api/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ secret: ADMIN_SECRET, action: "deleteMatch", id: matchId }),
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        toast.success("Match deleted");
+        fetchData();
+      } else {
+        toast.error(data.error || "Failed to delete match");
+      }
+    } catch (err) {
+      toast.error("Failed to delete match");
+    }
+  };
+
+  const handleCreateMarket = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      const res = await fetch("/api/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          secret: ADMIN_SECRET,
+          action: "createMarket",
+          matchId: newMarket.matchId,
+          market: {
+            id: `market-${Date.now()}`,
+            name: newMarket.name,
+            description: newMarket.description,
+            contracts: [],
+          },
+        }),
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        toast.success("Market created");
+        setNewMarket({ matchId: "", name: "", description: "" });
+        fetchData();
+      } else {
+        toast.error(data.error || "Failed to create market");
+      }
+    } catch (err) {
+      toast.error("Failed to create market");
+    }
+  };
+
+  const handleAddContract = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      const res = await fetch("/api/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          secret: ADMIN_SECRET,
+          action: "addContract",
+          matchId: newContract.matchId,
+          marketId: newContract.marketId,
+          contract: {
+            id: `contract-${Date.now()}`,
+            name: newContract.name,
+            pool: 0,
+            odds: 2.0,
+            probability: 0.5,
+          },
+        }),
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        toast.success("Contract added");
+        setNewContract({ matchId: "", marketId: "", name: "" });
+        fetchData();
+      } else {
+        toast.error(data.error || "Failed to add contract");
+      }
+    } catch (err) {
+      toast.error("Failed to add contract");
+    }
+  };
+
+  const handleDeleteMarket = async (matchId: string, marketId: string) => {
+    if (!confirm("Delete this market?")) return;
+    
+    try {
+      const res = await fetch("/api/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ secret: ADMIN_SECRET, action: "deleteMarket", matchId, marketId }),
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        toast.success("Market deleted");
+        fetchData();
+      } else {
+        toast.error(data.error || "Failed to delete market");
+      }
+    } catch (err) {
+      toast.error("Failed to delete market");
+    }
+  };
+
+  const handleDeleteContract = async (matchId: string, marketId: string, contractId: string) => {
+    if (!confirm("Delete this contract?")) return;
+    
+    try {
+      const res = await fetch("/api/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ secret: ADMIN_SECRET, action: "deleteContract", matchId, marketId, contractId }),
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        toast.success("Contract deleted");
+        fetchData();
+      } else {
+        toast.error(data.error || "Failed to delete contract");
+      }
+    } catch (err) {
+      toast.error("Failed to delete contract");
     }
   };
 
@@ -241,6 +431,237 @@ const Admin = () => {
                 </tbody>
               </table>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Create Match</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleCreateMatch} className="space-y-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <Input
+                  placeholder="Match ID (e.g. match-1)"
+                  value={newMatch.id}
+                  onChange={(e) => setNewMatch({ ...newMatch, id: e.target.value })}
+                  required
+                />
+                <Input
+                  placeholder="Home Team"
+                  value={newMatch.homeTeam}
+                  onChange={(e) => setNewMatch({ ...newMatch, homeTeam: e.target.value })}
+                  required
+                />
+                <Input
+                  placeholder="Away Team"
+                  value={newMatch.awayTeam}
+                  onChange={(e) => setNewMatch({ ...newMatch, awayTeam: e.target.value })}
+                  required
+                />
+                <Input
+                  placeholder="Start Time (ISO)"
+                  type="datetime-local"
+                  value={newMatch.startTime}
+                  onChange={(e) => setNewMatch({ ...newMatch, startTime: e.target.value })}
+                  required
+                />
+                <Input
+                  placeholder="Home Flag (emoji)"
+                  value={newMatch.homeFlag}
+                  onChange={(e) => setNewMatch({ ...newMatch, homeFlag: e.target.value })}
+                />
+                <Input
+                  placeholder="Away Flag (emoji)"
+                  value={newMatch.awayFlag}
+                  onChange={(e) => setNewMatch({ ...newMatch, awayFlag: e.target.value })}
+                />
+                <Input
+                  placeholder="Competition"
+                  value={newMatch.competition}
+                  onChange={(e) => setNewMatch({ ...newMatch, competition: e.target.value })}
+                />
+                <Button type="submit" disabled={creatingMatch}>
+                  {creatingMatch ? "Creating..." : "Create Match"}
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Matches ({matches.length})</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {matches.map((match) => (
+              <div key={match.id} className="border rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-semibold">
+                    {match.homeFlag} {match.homeTeam} vs {match.awayFlag} {match.awayTeam}
+                  </h3>
+                  <Button variant="destructive" size="sm" onClick={() => handleDeleteMatch(match.id)}>
+                    Delete
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground mb-2">
+                  {match.competition} · {new Date(match.startTime).toLocaleString()}
+                </p>
+                <span className={`text-xs px-2 py-0.5 rounded ${
+                  match.status === 'resolved' ? 'bg-green-500/20 text-green-500' : 
+                  match.status === 'locked' ? 'bg-yellow-500/20 text-yellow-500' : 
+                  'bg-blue-500/20 text-blue-500'
+                }`}>
+                  {match.status}
+                </span>
+              </div>
+            ))}
+            {matches.length === 0 && (
+              <p className="text-muted-foreground text-sm">No matches yet</p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Create Market</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleCreateMarket} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <select
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  value={newMarket.matchId}
+                  onChange={(e) => setNewMarket({ ...newMarket, matchId: e.target.value })}
+                  required
+                >
+                  <option value="">Select Match</option>
+                  {matches.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.homeTeam} vs {m.awayTeam}
+                    </option>
+                  ))}
+                </select>
+                <Input
+                  placeholder="Market Name"
+                  value={newMarket.name}
+                  onChange={(e) => setNewMarket({ ...newMarket, name: e.target.value })}
+                  required
+                />
+                <Input
+                  placeholder="Description (optional)"
+                  value={newMarket.description}
+                  onChange={(e) => setNewMarket({ ...newMarket, description: e.target.value })}
+                />
+                <Button type="submit">Create Market</Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Add Contract</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleAddContract} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <select
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  value={newContract.matchId}
+                  onChange={(e) => {
+                    setNewContract({ ...newContract, matchId: e.target.value, marketId: "" });
+                  }}
+                  required
+                >
+                  <option value="">Select Match</option>
+                  {matches.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.homeTeam} vs {m.awayTeam}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  value={newContract.marketId}
+                  onChange={(e) => setNewContract({ ...newContract, marketId: e.target.value })}
+                  required
+                  disabled={!newContract.matchId}
+                >
+                  <option value="">Select Market</option>
+                  {matches
+                    .find((m) => m.id === newContract.matchId)
+                    ?.markets.map((mk) => (
+                      <option key={mk.id} value={mk.id}>
+                        {mk.name}
+                      </option>
+                    ))}
+                </select>
+                <Input
+                  placeholder="Contract Name"
+                  value={newContract.name}
+                  onChange={(e) => setNewContract({ ...newContract, name: e.target.value })}
+                  required
+                />
+                <Button type="submit">Add Contract</Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Manage Markets & Contracts</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {matches.map((match) => (
+              <div key={match.id} className="border rounded-lg p-4">
+                <h3 className="font-semibold mb-3">
+                  {match.homeFlag} {match.homeTeam} vs {match.awayFlag} {match.awayTeam}
+                </h3>
+                {match.markets.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No markets</p>
+                ) : (
+                  match.markets.map((market) => (
+                    <div key={market.id} className="bg-secondary/50 rounded p-3 mb-2">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium">{market.name}</span>
+                        <div className="flex gap-2 items-center">
+                          <span className={`text-xs px-2 py-0.5 rounded ${
+                            market.status === 'resolved' ? 'bg-green-500/20 text-green-500' : 
+                            market.status === 'locked' ? 'bg-yellow-500/20 text-yellow-500' : 
+                            'bg-blue-500/20 text-blue-500'
+                          }`}>
+                            {market.status}
+                          </span>
+                          <Button variant="destructive" size="sm" onClick={() => handleDeleteMarket(match.id, market.id)}>
+                            Delete
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {market.contracts.map((contract) => (
+                          <div key={contract.id} className="flex items-center gap-1 bg-background rounded px-2 py-1 text-sm">
+                            <span>{contract.name}</span>
+                            <span className="text-muted-foreground text-xs">({contract.pool} pts)</span>
+                            {market.status !== 'resolved' && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-5 w-5 p-0 text-red-500 hover:text-red-700"
+                                onClick={() => handleDeleteContract(match.id, market.id, contract.id)}
+                              >
+                                ×
+                              </Button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            ))}
           </CardContent>
         </Card>
 

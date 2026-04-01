@@ -1,6 +1,4 @@
-import { supabase } from './db.js';
-
-
+import { getSupabase } from './db.js';
 
 export async function GET(request: Request) {
   try {
@@ -11,6 +9,7 @@ export async function GET(request: Request) {
       return Response.json({ error: 'Code required' }, { status: 400 });
     }
 
+    const supabase = getSupabase() as any;
     const { data: user, error } = await supabase
       .from('users')
       .select('*')
@@ -43,6 +42,7 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Missing data' }, { status: 400 });
     }
 
+    const supabase = getSupabase() as any;
     const { data: user, error: fetchError } = await supabase
       .from('users')
       .select('*')

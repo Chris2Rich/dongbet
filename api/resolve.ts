@@ -1,4 +1,4 @@
-import { supabase } from './db.js';
+import { getSupabase } from './db.js';
 
 
 
@@ -9,6 +9,8 @@ export async function POST(request: Request) {
     if (!matchId || !marketId || !contractId) {
       return Response.json({ error: 'Missing matchId, marketId, or contractId' }, { status: 400 });
     }
+
+    const supabase = getSupabase() as any;
 
     const { data: matchRecord, error: matchError } = await supabase
       .from('matches')

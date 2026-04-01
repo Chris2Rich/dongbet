@@ -1,4 +1,4 @@
-import { supabase } from './db.js';
+import { getSupabase } from './db.js';
 
 
 
@@ -25,6 +25,8 @@ export async function POST(request: Request) {
     if (isNaN(stakeNum) || stakeNum < 1) {
       return Response.json({ error: 'Minimum stake is 1 point' }, { status: 400 });
     }
+
+    const supabase = getSupabase() as any;
 
     const { data: user, error: userError } = await supabase
       .from('users')

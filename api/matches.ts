@@ -1,9 +1,10 @@
-import { supabase } from './db.js';
+import { getSupabase } from './db.js';
 
 
 
 export async function GET() {
   try {
+    const supabase = getSupabase() as any;
     const { data: matches, error } = await supabase
       .from('matches')
       .select('data')

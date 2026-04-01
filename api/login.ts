@@ -1,6 +1,4 @@
-import { supabase } from './db.js';
-
-
+import { getSupabase } from './db.js';
 
 export async function POST(request: Request) {
   try {
@@ -10,6 +8,7 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Invalid code' }, { status: 400 });
     }
 
+    const supabase = getSupabase() as any;
     const { data: user, error } = await supabase
       .from('users')
       .select('*')
