@@ -1,6 +1,6 @@
 import { supabase } from './_db';
 
-export const runtime = 'edge';
+
 
 const ADMIN_SECRET = '051007';
 

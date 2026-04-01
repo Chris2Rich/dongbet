@@ -1,6 +1,6 @@
 import { supabase } from './_db';
 
-export const runtime = 'edge';
+
 
 function calculateContractProbability(contracts: { pool: number }[]) {
   const total = contracts.reduce((sum, c) => sum + c.pool, 0);
