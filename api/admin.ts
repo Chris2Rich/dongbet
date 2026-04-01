@@ -1,4 +1,4 @@
-import { supabase } from './_db';
+import { supabase } from "./db";
 
 
 
