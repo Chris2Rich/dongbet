@@ -53,10 +53,12 @@ const PredictionCard = () => {
         </div>
 
         {selected && (
+          <a href="./login">
           <Button variant="hero" size="sm" className="w-full animate-fade-up text-xs">
             <Lock className="w-3 h-3 mr-1.5" />
-            Lock
+            Predict
           </Button>
+          </a>
         )}
       </div>
     </div>
