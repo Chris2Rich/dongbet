@@ -1,4 +1,4 @@
-import { getRedis } from './_redis';
+import { supabase } from './_db';
 
 export const runtime = 'edge';
 
@@ -10,17 +10,17 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Missing matchId, marketId, or contractId' }, { status: 400 });
     }
 
-    const redis = getRedis();
+    const { data: matchRecord, error: matchError } = await supabase
+      .from('matches')
+      .select('data')
+      .eq('id', matchId)
+      .single();
 
-    const matchesJson = await redis.get('matches');
-    const matches = matchesJson ? JSON.parse(matchesJson) : [];
-
-    const matchIndex = matches.findIndex((m: any) => m.id === matchId);
-    if (matchIndex === -1) {
+    if (matchError || !matchRecord) {
       return Response.json({ error: 'Match not found' }, { status: 404 });
     }
 
-    const match = matches[matchIndex];
+    const match = matchRecord.data;
     const marketIndex = (match.markets || []).findIndex((m: any) => m.id === marketId);
     if (marketIndex === -1) {
       return Response.json({ error: 'Market not found' }, { status: 404 });
@@ -40,18 +40,15 @@ export async function POST(request: Request) {
     market.status = 'resolved';
     market.result = contractId;
 
-    const userCodes = await redis.sMembers('users:set');
+    const { data: users, error: usersError } = await supabase
+      .from('users')
+      .select('*');
+
     let settledCount = 0;
     let totalPayout = 0;
 
-    if (userCodes && userCodes.length > 0) {
-      const userKeys = userCodes.map((c: string) => `user:${c}`);
-      const usersArray = await redis.mGet(userKeys);
-
-      for (const userJson of usersArray) {
-        if (!userJson) continue;
-        
-        const user = JSON.parse(userJson);
+    if (users && users.length > 0) {
+      for (const user of users) {
         const predictions = user.predictions || [];
         let userUpdated = false;
         
@@ -71,12 +68,18 @@ export async function POST(request: Request) {
         }
 
         if (userUpdated) {
-          await redis.set(`user:${user.code}`, JSON.stringify(user));
+          await supabase
+            .from('users')
+            .update({ points: user.points, predictions: user.predictions })
+            .eq('code', user.code);
         }
       }
     }
 
-    await redis.set('matches', JSON.stringify(matches));
+    await supabase
+      .from('matches')
+      .update({ data: match })
+      .eq('id', matchId);
 
     return Response.json({
       success: true,

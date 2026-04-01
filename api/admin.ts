@@ -1,4 +1,4 @@
-import { getRedis } from './_redis';
+import { supabase } from './_db';
 
 export const runtime = 'edge';
 
@@ -6,15 +6,6 @@ const ADMIN_SECRET = '051007';
 
 function verifySecret(secret: string): boolean {
   return secret === ADMIN_SECRET;
-}
-
-interface User {
-  code: string;
-  firstname: string;
-  lastname: string;
-  formgroup: string;
-  points: number;
-  predictions: any[];
 }
 
 export async function POST(request: Request) {
@@ -29,8 +20,6 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Missing action' }, { status: 400 });
     }
 
-    const redis = getRedis();
-
     if (action === 'createUser') {
       const { code, firstname, lastname, formgroup, points = 100 } = data;
       
@@ -38,12 +27,17 @@ export async function POST(request: Request) {
         return Response.json({ error: 'Missing required fields' }, { status: 400 });
       }
 
-      const userExists = await redis.exists(`user:${code}`);
-      if (userExists) {
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('code')
+        .eq('code', code)
+        .single();
+
+      if (existingUser) {
         return Response.json({ error: 'User already exists' }, { status: 400 });
       }
 
-      const newUser: User = {
+      const newUser = {
         code,
         firstname,
         lastname,
@@ -52,10 +46,17 @@ export async function POST(request: Request) {
         predictions: []
       };
 
-      await redis.set(`user:${code}`, JSON.stringify(newUser));
-      await redis.sAdd('users:set', code);
+      const { data: createdUser, error } = await supabase
+        .from('users')
+        .insert(newUser)
+        .select()
+        .single();
 
-      return Response.json({ success: true, user: newUser });
+      if (error) {
+        return Response.json({ error: 'Failed to create user' }, { status: 500 });
+      }
+
+      return Response.json({ success: true, user: createdUser });
     }
 
     if (action === 'updateUserPoints') {
@@ -69,46 +70,60 @@ export async function POST(request: Request) {
         return Response.json({ error: 'Invalid points value' }, { status: 400 });
       }
 
-      const userJson = await redis.get(`user:${code}`);
+      const { data: user, error: fetchError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('code', code)
+        .single();
       
-      if (!userJson) {
+      if (fetchError || !user) {
         return Response.json({ error: 'User not found' }, { status: 404 });
       }
 
-      const user = JSON.parse(userJson);
-      user.points = points;
-      await redis.set(`user:${code}`, JSON.stringify(user));
+      const { data: updatedUser, error: updateError } = await supabase
+        .from('users')
+        .update({ points })
+        .eq('code', code)
+        .select()
+        .single();
 
-      return Response.json({ success: true, user });
+      if (updateError) {
+        return Response.json({ error: 'Failed to update user' }, { status: 500 });
+      }
+
+      return Response.json({ success: true, user: updatedUser });
     }
 
     if (action === 'getAllUsers') {
-      const userCodes = await redis.sMembers('users:set');
-      
-      if (!userCodes || userCodes.length === 0) {
-        return Response.json({ users: [] });
+      const { data: users, error } = await supabase
+        .from('users')
+        .select('*');
+
+      if (error) {
+        return Response.json({ error: 'Failed to fetch users' }, { status: 500 });
       }
 
-      const userKeys = userCodes.map((c: string) => `user:${c}`);
-      const usersArray = await redis.mGet(userKeys);
-
-      const validUsers = usersArray
-        .filter(Boolean)
-        .map((u: string) => JSON.parse(u));
-
-      return Response.json({ users: validUsers });
+      return Response.json({ users: users || [] });
     }
 
     if (action === 'getAllMatches') {
-      const matchesJson = await redis.get('matches');
-      const matches = matchesJson ? JSON.parse(matchesJson) : [];
-      return Response.json({ matches });
+      const { data: matches, error } = await supabase
+        .from('matches')
+        .select('data')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        return Response.json({ error: 'Failed to fetch matches' }, { status: 500 });
+      }
+
+      const matchesList = (matches || []).map(m => m.data);
+      return Response.json({ matches: matchesList });
     }
 
     return Response.json({ error: 'Unknown action' }, { status: 400 });
     
   } catch (error) {
-    console.error('Admin Redis error:', error);
+    console.error('Admin error:', error);
     return Response.json({ error: 'Server error' }, { status: 500 });
   }
 }

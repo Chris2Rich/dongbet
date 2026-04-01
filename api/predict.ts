@@ -1,4 +1,4 @@
-import { getRedis } from './_redis';
+import { supabase } from './_db';
 
 export const runtime = 'edge';
 
@@ -26,28 +26,31 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Minimum stake is 1 point' }, { status: 400 });
     }
 
-    const redis = getRedis();
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('code', code)
+      .single();
 
-    const userJson = await redis.get(`user:${code}`);
-    if (!userJson) {
+    if (userError || !user) {
       return Response.json({ error: 'User not found' }, { status: 404 });
     }
-
-    const user = JSON.parse(userJson);
 
     if (user.points < stakeNum) {
       return Response.json({ error: 'Insufficient points' }, { status: 400 });
     }
 
-    const matchesJson = await redis.get('matches');
-    const matches = matchesJson ? JSON.parse(matchesJson) : [];
-    
-    const matchIndex = matches.findIndex((m: any) => m.id === matchId);
-    if (matchIndex === -1) {
+    const { data: matchRecord, error: matchError } = await supabase
+      .from('matches')
+      .select('data')
+      .eq('id', matchId)
+      .single();
+
+    if (matchError || !matchRecord) {
       return Response.json({ error: 'Match not found' }, { status: 404 });
     }
 
-    const match = matches[matchIndex];
+    const match = matchRecord.data;
     
     if (match.status !== 'open') {
       return Response.json({ error: 'Match is not open for predictions' }, { status: 400 });
@@ -114,8 +117,23 @@ export async function POST(request: Request) {
     });
     market.history = history;
 
-    await redis.set(`user:${code}`, JSON.stringify(user));
-    await redis.set('matches', JSON.stringify(matches));
+    const { error: updateUserError } = await supabase
+      .from('users')
+      .update({ points: user.points, predictions: user.predictions })
+      .eq('code', code);
+
+    if (updateUserError) {
+      return Response.json({ error: 'Failed to update user' }, { status: 500 });
+    }
+
+    const { error: updateMatchError } = await supabase
+      .from('matches')
+      .update({ data: match })
+      .eq('id', matchId);
+
+    if (updateMatchError) {
+      return Response.json({ error: 'Failed to update match' }, { status: 500 });
+    }
 
     return Response.json({
       success: true,

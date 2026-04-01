@@ -1,4 +1,4 @@
-import { getRedis } from './_redis';
+import { supabase } from './_db';
 
 export const runtime = 'edge';
 
@@ -11,17 +11,18 @@ export async function GET(request: Request) {
       return Response.json({ error: 'Code required' }, { status: 400 });
     }
 
-    const redis = getRedis();
-    const userJson = await redis.get(`user:${code}`);
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('code', code)
+      .single();
 
-    if (!userJson) {
+    if (error || !user) {
       return Response.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const user = JSON.parse(userJson);
-
     return Response.json({
-      code,
+      code: user.code,
       firstname: user.firstname,
       lastname: user.lastname,
       formgroup: user.formgroup,
@@ -42,14 +43,15 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Missing data' }, { status: 400 });
     }
 
-    const redis = getRedis();
-    const userJson = await redis.get(`user:${code}`);
+    const { data: user, error: fetchError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('code', code)
+      .single();
 
-    if (!userJson) {
+    if (fetchError || !user) {
       return Response.json({ error: 'User not found' }, { status: 404 });
     }
-
-    const user = JSON.parse(userJson);
 
     const existingPredictions = user.predictions || [];
     const alreadyPredicted = existingPredictions.some((p: any) => p.matchId === prediction.matchId);
@@ -58,13 +60,20 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Already predicted' }, { status: 400 });
     }
 
-    user.predictions = [...existingPredictions, {
+    const updatedPredictions = [...existingPredictions, {
       ...prediction,
       timestamp: new Date().toISOString(),
       pointsEarned: 0
     }];
 
-    await redis.set(`user:${code}`, JSON.stringify(user));
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({ predictions: updatedPredictions })
+      .eq('code', code);
+
+    if (updateError) {
+      return Response.json({ error: 'Failed to save prediction' }, { status: 500 });
+    }
 
     return Response.json({ success: true });
   } catch (error) {

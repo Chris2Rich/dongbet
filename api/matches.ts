@@ -1,13 +1,20 @@
-import { getRedis } from './_redis';
+import { supabase } from './_db';
 
 export const runtime = 'edge';
 
 export async function GET() {
   try {
-    const redis = getRedis();
-    const matchesJson = await redis.get('matches');
-    const matches = matchesJson ? JSON.parse(matchesJson) : [];
-    return Response.json({ matches });
+    const { data: matches, error } = await supabase
+      .from('matches')
+      .select('data')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      return Response.json({ error: 'Failed to fetch matches' }, { status: 500 });
+    }
+
+    const matchesList = (matches || []).map(m => m.data);
+    return Response.json({ matches: matchesList });
   } catch (error) {
     console.error('Matches error:', error);
     return Response.json({ error: 'Server error' }, { status: 500 });

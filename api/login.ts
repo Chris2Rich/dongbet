@@ -1,4 +1,4 @@
-import { getRedis } from './_redis';
+import { supabase } from './_db';
 
 export const runtime = 'edge';
 
@@ -10,19 +10,20 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Invalid code' }, { status: 400 });
     }
 
-    const redis = getRedis();
-    const userJson = await redis.get(`user:${code}`);
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('code', code)
+      .single();
 
-    if (!userJson) {
+    if (error || !user) {
       return Response.json({ error: 'Invalid code' }, { status: 401 });
     }
-
-    const user = JSON.parse(userJson);
 
     return Response.json({
       success: true,
       user: {
-        code,
+        code: user.code,
         firstname: user.firstname,
         lastname: user.lastname,
         formgroup: user.formgroup,
