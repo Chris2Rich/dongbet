@@ -119,7 +119,7 @@ const Login = () => {
         </div>
 
         <p className="text-center text-muted-foreground/60 text-[11px] sm:text-xs mt-5 sm:mt-6 opacity-0 animate-fade-up" style={{ animationDelay: "400ms" }}>
-          Got your code from your teacher
+          Get your code from the DongBet stall. Each account costs £3.
         </p>
       </div>
     </div>
