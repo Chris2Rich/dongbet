@@ -159,14 +159,16 @@ const Admin = () => {
       const res = await fetch("/api/admin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ secret: ADMIN_SECRET, action: "createMatch", ...newMatch }),
+        body: JSON.stringify({ secret: ADMIN_SECRET, action: "createMatch", ...newMatch, autoMarkets }),
       });
       
       const data = await res.json();
       
       if (res.ok) {
-        toast.success(`Match ${newMatch.homeTeam} vs ${newMatch.awayTeam} created`);
+        const marketCount = autoMarkets ? " with 7 auto-markets" : "";
+        toast.success(`Match ${newMatch.homeTeam} vs ${newMatch.awayTeam} created${marketCount}`);
         setNewMatch({ id: "", homeTeam: "", awayTeam: "", homeFlag: "", awayFlag: "", competition: "", startTime: "" });
+        setAutoMarkets(true);
         fetchData();
       } else {
         toast.error(data.error || "Failed to create match");
@@ -457,13 +459,19 @@ const Admin = () => {
                 <Input
                   placeholder="Home Team"
                   value={newMatch.homeTeam}
-                  onChange={(e) => setNewMatch({ ...newMatch, homeTeam: e.target.value })}
+                  onChange={(e) => {
+                    const flag = getFlagEmoji(e.target.value);
+                    setNewMatch({ ...newMatch, homeTeam: e.target.value, homeFlag: flag || newMatch.homeFlag });
+                  }}
                   required
                 />
                 <Input
                   placeholder="Away Team"
                   value={newMatch.awayTeam}
-                  onChange={(e) => setNewMatch({ ...newMatch, awayTeam: e.target.value })}
+                  onChange={(e) => {
+                    const flag = getFlagEmoji(e.target.value);
+                    setNewMatch({ ...newMatch, awayTeam: e.target.value, awayFlag: flag || newMatch.awayFlag });
+                  }}
                   required
                 />
                 <Input
@@ -473,24 +481,107 @@ const Admin = () => {
                   onChange={(e) => setNewMatch({ ...newMatch, startTime: e.target.value })}
                   required
                 />
-                <Input
-                  placeholder="Home Flag (emoji)"
-                  value={newMatch.homeFlag}
-                  onChange={(e) => setNewMatch({ ...newMatch, homeFlag: e.target.value })}
-                />
-                <Input
-                  placeholder="Away Flag (emoji)"
-                  value={newMatch.awayFlag}
-                  onChange={(e) => setNewMatch({ ...newMatch, awayFlag: e.target.value })}
-                />
+                <div className="relative">
+                  <Input
+                    placeholder="Home Flag (auto-detected)"
+                    value={newMatch.homeFlag}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setNewMatch({ ...newMatch, homeFlag: val });
+                      if (val.length > 0) {
+                        const filtered = COUNTRY_NAMES.filter((c) => c.includes(val.toLowerCase()));
+                        setHomeFlagSuggestions(filtered.slice(0, 5));
+                        setShowHomeSuggestions(true);
+                      } else {
+                        setShowHomeSuggestions(false);
+                      }
+                    }}
+                    onFocus={() => {
+                      if (newMatch.homeFlag.length > 0) {
+                        const filtered = COUNTRY_NAMES.filter((c) => c.includes(newMatch.homeFlag.toLowerCase()));
+                        setHomeFlagSuggestions(filtered.slice(0, 5));
+                        setShowHomeSuggestions(true);
+                      }
+                    }}
+                    onBlur={() => setTimeout(() => setShowHomeSuggestions(false), 200)}
+                  />
+                  {showHomeSuggestions && homeFlagSuggestions.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-popover border rounded-md shadow-md">
+                      {homeFlagSuggestions.map((country) => (
+                        <div
+                          key={country}
+                          className="px-3 py-2 text-sm cursor-pointer hover:bg-accent"
+                          onMouseDown={() => {
+                            setNewMatch({ ...newMatch, homeFlag: getFlagEmoji(country) });
+                            setShowHomeSuggestions(false);
+                          }}
+                        >
+                          {getFlagEmoji(country)} {country}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="relative">
+                  <Input
+                    placeholder="Away Flag (auto-detected)"
+                    value={newMatch.awayFlag}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setNewMatch({ ...newMatch, awayFlag: val });
+                      if (val.length > 0) {
+                        const filtered = COUNTRY_NAMES.filter((c) => c.includes(val.toLowerCase()));
+                        setAwayFlagSuggestions(filtered.slice(0, 5));
+                        setShowAwaySuggestions(true);
+                      } else {
+                        setShowAwaySuggestions(false);
+                      }
+                    }}
+                    onFocus={() => {
+                      if (newMatch.awayFlag.length > 0) {
+                        const filtered = COUNTRY_NAMES.filter((c) => c.includes(newMatch.awayFlag.toLowerCase()));
+                        setAwayFlagSuggestions(filtered.slice(0, 5));
+                        setShowAwaySuggestions(true);
+                      }
+                    }}
+                    onBlur={() => setTimeout(() => setShowAwaySuggestions(false), 200)}
+                  />
+                  {showAwaySuggestions && awayFlagSuggestions.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-popover border rounded-md shadow-md">
+                      {awayFlagSuggestions.map((country) => (
+                        <div
+                          key={country}
+                          className="px-3 py-2 text-sm cursor-pointer hover:bg-accent"
+                          onMouseDown={() => {
+                            setNewMatch({ ...newMatch, awayFlag: getFlagEmoji(country) });
+                            setShowAwaySuggestions(false);
+                          }}
+                        >
+                          {getFlagEmoji(country)} {country}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <Input
                   placeholder="Competition"
                   value={newMatch.competition}
                   onChange={(e) => setNewMatch({ ...newMatch, competition: e.target.value })}
                 />
-                <Button type="submit" disabled={creatingMatch}>
-                  {creatingMatch ? "Creating..." : "Create Match"}
-                </Button>
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2 text-sm cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={autoMarkets}
+                      onChange={(e) => setAutoMarkets(e.target.checked)}
+                      className="rounded border-input"
+                    />
+                    Auto-add markets
+                  </label>
+                  <Button type="submit" disabled={creatingMatch}>
+                    {creatingMatch ? "Creating..." : "Create Match"}
+                  </Button>
+                </div>
               </div>
             </form>
           </CardContent>
