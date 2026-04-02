@@ -4,6 +4,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
+import TournamentOver from "./pages/TournamentOver.tsx";
+import Leaderboard from "./pages/Leaderboard.tsx";
 import Login from "./pages/Login.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import Admin from "./pages/Admin.tsx";
@@ -24,6 +26,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/tournament-over" element={<TournamentOver />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={
             <ProtectedRoute>
