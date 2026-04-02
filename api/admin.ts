@@ -1,11 +1,114 @@
 import { getSupabase } from './db.js';
 
-
-
 const ADMIN_SECRET = '051007';
 
 function verifySecret(secret: string): boolean {
   return secret === ADMIN_SECRET;
+}
+
+const COUNTRY_FLAGS: Record<string, string> = {
+  "afghanistan": "🇦🇫", "albania": "🇦🇱", "algeria": "🇩🇿", "andorra": "🇦🇩", "angola": "🇦🇴",
+  "antigua and barbuda": "🇦🇬", "argentina": "🇦🇷", "armenia": "🇦🇲", "australia": "🇦🇺", "austria": "🇦🇹",
+  "azerbaijan": "🇦🇿", "bahamas": "🇧🇸", "bahrain": "🇧🇭", "bangladesh": "🇧🇩", "barbados": "🇧🇧",
+  "belarus": "🇧🇾", "belgium": "🇧🇪", "belize": "🇧🇿", "benin": "🇧🇯", "bhutan": "🇧🇹",
+  "bolivia": "🇧🇴", "bosnia and herzegovina": "🇧🇦", "bosnia": "🇧🇦", "botswana": "🇧🇼", "brazil": "🇧🇷",
+  "brunei": "🇧🇳", "bulgaria": "🇧🇬", "burkina faso": "🇧🇫", "burundi": "🇧🇮", "cabo verde": "🇨🇻",
+  "cape verde": "🇨🇻", "cambodia": "🇰🇭", "cameroon": "🇨🇲", "canada": "🇨🇦", "central african republic": "🇨🇫",
+  "chad": "🇹🇩", "chile": "🇨🇱", "china": "🇨🇳", "colombia": "🇨🇴", "comoros": "🇰🇲",
+  "congo": "🇨🇬", "costa rica": "🇨🇷", "croatia": "🇭🇷", "cuba": "🇨🇺", "cyprus": "🇨🇾",
+  "czech republic": "🇨🇿", "czechia": "🇨🇿", "democratic republic of the congo": "🇨🇩", "denmark": "🇩🇰",
+  "djibouti": "🇩🇯", "dominica": "🇩🇲", "dominican republic": "🇩🇴", "east timor": "🇹🇱", "timor leste": "🇹🇱",
+  "ecuador": "🇪🇨", "egypt": "🇪🇬", "el salvador": "🇸🇻", "england": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "equatorial guinea": "🇬🇶",
+  "eritrea": "🇪🇷", "estonia": "🇪🇪", "eswatini": "🇸🇿", "swaziland": "🇸🇿", "ethiopia": "🇪🇹",
+  "fiji": "🇫🇯", "finland": "🇫🇮", "france": "🇫🇷", "gabon": "🇬🇦", "gambia": "🇬🇲",
+  "georgia": "🇬🇪", "germany": "🇩🇪", "ghana": "🇬🇭", "greece": "🇬🇷", "grenada": "🇬🇩",
+  "guatemala": "🇬🇹", "guinea": "🇬🇳", "guinea bissau": "🇬🇼", "guyana": "🇬🇾", "haiti": "🇭🇹",
+  "honduras": "🇭🇳", "hungary": "🇭🇺", "iceland": "🇮🇸", "india": "🇮🇳", "indonesia": "🇮🇩",
+  "iran": "🇮🇷", "iraq": "🇮🇶", "ireland": "🇮🇪", "israel": "🇮🇱", "italy": "🇮🇹",
+  "ivory coast": "🇨🇮", "cote d'ivoire": "🇨🇮", "jamaica": "🇯🇲", "japan": "🇯🇵", "jordan": "🇯🇴",
+  "kazakhstan": "🇰🇿", "kenya": "🇰🇪", "kiribati": "🇰🇮", "kosovo": "🇽🇰", "kuwait": "🇰🇼",
+  "kyrgyzstan": "🇰🇬", "laos": "🇱🇦", "latvia": "🇱🇻", "lebanon": "🇱🇧", "lesotho": "🇱🇸",
+  "liberia": "🇱🇷", "libya": "🇱🇾", "liechtenstein": "🇱🇮", "lithuania": "🇱🇹", "luxembourg": "🇱🇺",
+  "madagascar": "🇲🇬", "malawi": "🇲🇼", "malaysia": "🇲🇾", "maldives": "🇲🇻", "mali": "🇲🇱",
+  "malta": "🇲🇹", "marshall islands": "🇲🇭", "mauritania": "🇲🇷", "mauritius": "🇲🇺", "mexico": "🇲🇽",
+  "micronesia": "🇫🇲", "moldova": "🇲🇩", "monaco": "🇲🇨", "mongolia": "🇲🇳", "montenegro": "🇲🇪",
+  "morocco": "🇲🇦", "mozambique": "🇲🇿", "myanmar": "🇲🇲", "burma": "🇲🇲", "namibia": "🇳🇦",
+  "nauru": "🇳🇷", "nepal": "🇳🇵", "netherlands": "🇳🇱", "holland": "🇳🇱", "new zealand": "🇳🇿",
+  "nicaragua": "🇳🇮", "niger": "🇳🇪", "nigeria": "🇳🇬", "north korea": "🇰🇵", "north macedonia": "🇲🇰",
+  "macedonia": "🇲🇰", "norway": "🇳🇴", "oman": "🇴🇲", "pakistan": "🇵🇰", "palau": "🇵🇼",
+  "palestine": "🇵🇸", "panama": "🇵🇦", "papua new guinea": "🇵🇬", "paraguay": "🇵🇾", "peru": "🇵🇪",
+  "philippines": "🇵🇭", "poland": "🇵🇱", "portugal": "🇵🇹", "qatar": "🇶🇦", "romania": "🇷🇴",
+  "russia": "🇷🇺", "rwanda": "🇷🇼", "saint kitts and nevis": "🇰🇳", "saint lucia": "🇱🇨",
+  "saint vincent and the grenadines": "🇻🇨", "samoa": "🇼🇸", "san marino": "🇸🇲", "sao tome and principe": "🇸🇹",
+  "saudi arabia": "🇸🇦", "scotland": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "senegal": "🇸🇳", "serbia": "🇷🇸", "seychelles": "🇸🇨",
+  "sierra leone": "🇸🇱", "singapore": "🇸🇬", "slovakia": "🇸🇰", "slovenia": "🇸🇮", "solomon islands": "🇸🇧",
+  "somalia": "🇸🇴", "south africa": "🇿🇦", "south korea": "🇰🇷", "south sudan": "🇸🇸", "spain": "🇪🇸",
+  "sri lanka": "🇱🇰", "sudan": "🇸🇩", "suriname": "🇸🇷", "sweden": "🇸🇪", "switzerland": "🇨🇭",
+  "syria": "🇸🇾", "taiwan": "🇹🇼", "tajikistan": "🇹🇯", "tanzania": "🇹🇿", "thailand": "🇹🇭",
+  "togo": "🇹🇬", "tonga": "🇹🇴", "trinidad and tobago": "🇹🇹", "trinidad": "🇹🇹", "tunisia": "🇹🇳",
+  "turkey": "🇹🇷", "turkmenistan": "🇹🇲", "tuvalu": "🇹🇻", "uganda": "🇺🇬", "ukraine": "🇺🇦",
+  "united arab emirates": "🇦🇪", "uae": "🇦🇪", "united kingdom": "🇬🇧", "uk": "🇬🇧", "britain": "🇬🇧",
+  "united states": "🇺🇸", "usa": "🇺🇸", "us": "🇺🇸", "uruguay": "🇺🇾", "uzbekistan": "🇺🇿",
+  "vanuatu": "🇻🇺", "vatican city": "🇻🇦", "venezuela": "🇻🇪", "vietnam": "🇻🇳", "wales": "🏴󠁧󠁢󠁷󠁬󠁳󠁿",
+  "yemen": "🇾🇪", "zambia": "🇿🇲", "zimbabwe": "🇿🇼",
+};
+
+function getFlag(countryName: string): string {
+  if (!countryName) return "";
+  const normalized = countryName.toLowerCase().trim();
+  return COUNTRY_FLAGS[normalized] || "";
+}
+
+function generateDefaultMarkets(homeTeam: string, awayTeam: string) {
+  const templates = [
+    {
+      name: `${homeTeam} or ${awayTeam}?`,
+      contracts: [{ name: `${homeTeam} Win` }, { name: `Draw` }, { name: `${awayTeam} Win` }],
+    },
+    {
+      name: `${homeTeam} Goals`,
+      contracts: [{ name: "0" }, { name: "1" }, { name: "2" }, { name: "3" }, { name: "4+" }],
+    },
+    {
+      name: `${awayTeam} Goals`,
+      contracts: [{ name: "0" }, { name: "1" }, { name: "2" }, { name: "3" }, { name: "4+" }],
+    },
+    {
+      name: "Total Goals",
+      contracts: [{ name: "0" }, { name: "1" }, { name: "2" }, { name: "3" }, { name: "4" }, { name: "5+" }],
+    },
+    {
+      name: "Total Saves",
+      contracts: [{ name: "0" }, { name: "1-2" }, { name: "3-5" }, { name: "6-8" }, { name: "9+" }],
+    },
+    {
+      name: "Shots on Target",
+      contracts: [{ name: "0" }, { name: "1-2" }, { name: "3-5" }, { name: "6-8" }, { name: "9+" }],
+    },
+    {
+      name: "Extra Time?",
+      contracts: [{ name: "Yes" }, { name: "No" }],
+    },
+  ];
+
+  const now = Date.now();
+  return templates.map((template, i) => {
+    const marketId = `market-${now}-${i}`;
+    return {
+      id: marketId,
+      name: template.name,
+      status: "open",
+      result: null,
+      contracts: template.contracts.map((c, j) => ({
+        id: `contract-${marketId}-${j}`,
+        name: c.name,
+        pool: 0,
+        odds: 2.0,
+        probability: 0.5,
+      })),
+      history: [],
+    };
+  });
 }
 
 export async function POST(request: Request) {
@@ -123,22 +226,30 @@ export async function POST(request: Request) {
     }
 
     if (action === 'createMatch') {
-      const { id, homeTeam, awayTeam, homeFlag, awayFlag, competition, startTime, markets } = data;
+      const { id, homeTeam, awayTeam, homeFlag, awayFlag, competition, startTime, markets, autoMarkets } = data;
       
       if (!id || !homeTeam || !awayTeam || !startTime) {
         return Response.json({ error: 'Missing required fields' }, { status: 400 });
+      }
+
+      const resolvedHomeFlag = homeFlag || getFlag(homeTeam);
+      const resolvedAwayFlag = awayFlag || getFlag(awayTeam);
+
+      let matchMarkets = markets || [];
+      if (autoMarkets && matchMarkets.length === 0) {
+        matchMarkets = generateDefaultMarkets(homeTeam, awayTeam);
       }
 
       const matchData = {
         id,
         homeTeam,
         awayTeam,
-        homeFlag: homeFlag || '',
-        awayFlag: awayFlag || '',
+        homeFlag: resolvedHomeFlag,
+        awayFlag: resolvedAwayFlag,
         competition: competition || '',
         startTime,
         status: 'open',
-        markets: markets || []
+        markets: matchMarkets
       };
 
       const { data: createdMatch, error } = await supabase

@@ -3,8 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { getFlagEmoji, getAllCountryNames } from "@/lib/country-flags";
 
 const ADMIN_SECRET = "051007";
+const COUNTRY_NAMES = getAllCountryNames();
 
 interface User {
   code: string;
@@ -65,6 +67,11 @@ const Admin = () => {
     startTime: "",
   });
   const [creatingMatch, setCreatingMatch] = useState(false);
+  const [autoMarkets, setAutoMarkets] = useState(true);
+  const [homeFlagSuggestions, setHomeFlagSuggestions] = useState<string[]>([]);
+  const [awayFlagSuggestions, setAwayFlagSuggestions] = useState<string[]>([]);
+  const [showHomeSuggestions, setShowHomeSuggestions] = useState(false);
+  const [showAwaySuggestions, setShowAwaySuggestions] = useState(false);
 
   const [newMarket, setNewMarket] = useState<{ matchId: string; name: string; description: string }>({
     matchId: "",
