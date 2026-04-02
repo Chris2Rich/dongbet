@@ -61,8 +61,8 @@ const HeroSection = () => {
 
         <div className="grid grid-cols-2 gap-2.5 sm:gap-4 max-w-xs sm:max-w-sm mx-auto opacity-0 animate-fade-up" style={{ animationDelay: "400ms" }}>
           {[
-            { icon: Award, value: "£50", label: "Prize", color: "text-primary" },
-            { icon: Ticket, value: "£3", label: "Entry", color: "text-primary" },
+            { icon: Award, value: "£20", label: "Prize", color: "text-primary" },
+            { icon: Ticket, value: "£1", label: "Entry", color: "text-primary" },
           ].map((stat) => (
             <div key={stat.label} className="glass p-3 sm:p-4 border border-border/50">
               <stat.icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${stat.color} mx-auto mb-1.5 sm:mb-2`} />
